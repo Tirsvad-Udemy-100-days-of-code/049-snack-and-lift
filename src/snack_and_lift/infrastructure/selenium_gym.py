@@ -24,6 +24,7 @@ from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.support.ui import WebDriverWait
 
 from snack_and_lift import constants
+from snack_and_lift.domain.booking_entry import BookingEntry
 from snack_and_lift.domain.errors import GymError, LoginFailedError
 from snack_and_lift.domain.models import ButtonState, ClassCard
 
@@ -161,6 +162,66 @@ class SeleniumGym:
         if error:
             raise GymError(error)
         return text
+
+    @_translate_errors
+    def open_my_bookings(self) -> None:
+        """@brief Click the My Bookings link and wait for the page.
+
+        @exception GymError The page did not load.
+        """
+        self._wait.until(ec.element_to_be_clickable((By.ID, constants.MY_BOOKINGS_LINK_ID))).click()
+        self._wait.until(ec.presence_of_element_located((By.ID, constants.MY_BOOKINGS_PAGE_ID)))
+
+    @_translate_errors
+    def list_my_bookings(self) -> list[BookingEntry]:
+        """@brief Wait for the bookings to load, then read the confirmed and waitlist cards.
+
+        @return The entries, confirmed ones first; empty when the page shows its empty state.
+        @exception GymError The page shows an error box, or nothing was shown in time.
+        """
+        self._wait.until(
+            ec.any_of(
+                ec.presence_of_element_located((By.CSS_SELECTOR, constants.BOOKING_CARD_CSS)),
+                ec.presence_of_element_located((By.CSS_SELECTOR, constants.WAITLIST_CARD_CSS)),
+                ec.presence_of_element_located((By.ID, constants.EMPTY_BOOKINGS_STATE_ID)),
+                ec.presence_of_element_located((By.ID, constants.ERROR_MESSAGE_ID)),
+            )
+        )
+        errors = self._driver.find_elements(By.ID, constants.ERROR_MESSAGE_ID)
+        if errors:
+            raise GymError(errors[0].text or "My Bookings error")
+        confirmed = self._driver.find_elements(By.CSS_SELECTOR, constants.BOOKING_CARD_CSS)
+        waitlist = self._driver.find_elements(By.CSS_SELECTOR, constants.WAITLIST_CARD_CSS)
+        return [
+            self._read_entry(
+                element, constants.BOOKING_CARD_ID_PREFIX, constants.BOOKING_NAME_ID_PREFIX, False
+            )
+            for element in confirmed
+        ] + [
+            self._read_entry(
+                element, constants.WAITLIST_CARD_ID_PREFIX, constants.WAITLIST_NAME_ID_PREFIX, True
+            )
+            for element in waitlist
+        ]
+
+    @staticmethod
+    def _read_entry(
+        element: WebElement, card_prefix: str, name_prefix: str, waitlisted: bool
+    ) -> BookingEntry:
+        """@brief Turn one booking or waitlist card into plain data.
+
+        @param element The card.
+        @param card_prefix The prefix of the card id.
+        @param name_prefix The prefix of the id of the card's heading.
+        @param waitlisted True for a card of the waitlist section.
+        @return The entry.
+        """
+        card_id = (element.get_attribute("id") or "").removeprefix(card_prefix)
+        return BookingEntry.from_page(
+            heading=element.find_element(By.ID, name_prefix + card_id).text,
+            when_text=element.find_element(By.XPATH, constants.WHEN_XPATH).text,
+            waitlisted=waitlisted,
+        )
 
     @_translate_errors
     def save_text_screenshot(self, text: str, path: Path) -> None:

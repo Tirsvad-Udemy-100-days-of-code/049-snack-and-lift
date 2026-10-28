@@ -5,6 +5,7 @@
 from pathlib import Path
 from typing import Protocol
 
+from snack_and_lift.domain.booking_entry import BookingEntry
 from snack_and_lift.domain.models import ClassCard
 
 
@@ -43,6 +44,21 @@ class GymPort(Protocol):
         @return The new text of the button.
         @exception GymError The site shows an error for the class (the message is its text)
             or nothing settled in time.
+        """
+        ...
+
+    def open_my_bookings(self) -> None:
+        """@brief Open the My Bookings page and wait until it is shown.
+
+        @exception GymError The page did not load.
+        """
+        ...
+
+    def list_my_bookings(self) -> list[BookingEntry]:
+        """@brief Read every confirmed booking and waitlist entry of the My Bookings page.
+
+        @return The entries, confirmed ones first; empty when the page shows its empty state.
+        @exception GymError The page shows an error (the message is its text) or did not settle.
         """
         ...
 

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Fixture gym my bookings</title></head>
+<body>
+  <nav><a id="my-bookings-link" href="my_bookings.html">My Bookings</a></nav>
+  <div id="my-bookings-page" data-bookings-count="0" data-waitlist-count="0" data-loading="true">
+    <h1>My Bookings</h1>
+    <p id="loading-placeholder">Loading your bookings...</p>
+    <div id="content"></div>
+  </div>
+  <script>
+    // Imitates the site: a loading text, then the page for the state in the query
+    // (?state=empty or ?state=error; anything else shows two bookings and a waitlist entry).
+    const state = new URLSearchParams(window.location.search).get("state");
+    // The nav link keeps the state, so opening the page from here shows the same state again.
+    document.getElementById("my-bookings-link").href = "my_bookings.html" + window.location.search;
+    const page = document.getElementById("my-bookings-page");
+    const content = document.getElementById("content");
+    setTimeout(function () {
+      document.getElementById("loading-placeholder").remove();
+      page.dataset.loading = "false";
+      if (state === "error") {
+        content.innerHTML = '<div id="error-message">Failed to load bookings</div>';
+      } else if (state === "empty") {
+        content.innerHTML = '<div id="empty-bookings-state">You have no bookings yet</div>';
+      } else {
+        page.dataset.bookingsCount = "2";
+        page.dataset.waitlistCount = "1";
+        content.innerHTML =
+          '<div id="confirmed-bookings-section">' +
+          '<div id="booking-card-11" data-booking-status="confirmed">' +
+          '<h3 id="booking-class-name-11">Spin Class</h3>' +
+          '<p><strong>When:</strong> Tue, Aug 12, 6:00 PM</p></div>' +
+          '<div id="booking-card-12" data-booking-status="confirmed">' +
+          '<h3 id="booking-class-name-12">Yoga Class</h3>' +
+          '<p><strong>When:</strong> Wed, Aug 13, 7:00 AM</p></div>' +
+          '</div>' +
+          '<div id="waitlist-section">' +
+          '<div id="waitlist-card-21" data-booking-status="waitlisted">' +
+          '<h3 id="waitlist-class-name-21">HIIT Class (Waitlist)</h3>' +
+          '<p><strong>When:</strong> Thu, Aug 14, 6:00 PM</p></div>' +
+          '</div>';
+      }
+    }, 200);
+  </script>
+</body>
+</html>

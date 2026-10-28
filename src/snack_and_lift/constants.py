@@ -152,3 +152,54 @@ CONSOLE_PAGE_TEMPLATE: Final[str] = (
 
 ## Prefix of the `data:` URL that carries the console page.
 CONSOLE_PAGE_URL_PREFIX: Final[str] = "data:text/html;charset=utf-8,"
+
+## File names of the screenshots of lecture steps 7 and 8.
+SCREENSHOT_STEP_7: Final[str] = "step-7.png"
+SCREENSHOT_STEP_8: Final[str] = "step-8.png"
+
+## Process exit code when the My Bookings page does not match what the bot did.
+EXIT_VERIFICATION_MISMATCH: Final[int] = 3
+
+## Id of the navigation link that opens the My Bookings page.
+MY_BOOKINGS_LINK_ID: Final[str] = "my-bookings-link"
+
+## Id of the My Bookings page, shown after its bookings were loaded.
+MY_BOOKINGS_PAGE_ID: Final[str] = "my-bookings-page"
+
+## Id of the element shown when the account has no booking and no waitlist entry.
+EMPTY_BOOKINGS_STATE_ID: Final[str] = "empty-bookings-state"
+
+## CSS selectors of the confirmed booking cards and the waitlist cards.
+BOOKING_CARD_CSS: Final[str] = "#confirmed-bookings-section div[id^='booking-card-']"
+WAITLIST_CARD_CSS: Final[str] = "#waitlist-section div[id^='waitlist-card-']"
+
+## Prefixes of the element ids of a booking card and of a waitlist card.
+BOOKING_CARD_ID_PREFIX: Final[str] = "booking-card-"
+BOOKING_NAME_ID_PREFIX: Final[str] = "booking-class-name-"
+WAITLIST_CARD_ID_PREFIX: Final[str] = "waitlist-card-"
+WAITLIST_NAME_ID_PREFIX: Final[str] = "waitlist-class-name-"
+
+## XPath, relative to a card, of the paragraph "When: Tue, Aug 12, 6:00 PM".
+WHEN_XPATH: Final[str] = ".//p[strong[starts-with(normalize-space(), 'When:')]]"
+
+## Prefix of the date and time text of a booking card.
+WHEN_TEXT_PREFIX: Final[str] = "When:"
+
+## Suffix the My Bookings page adds to the name of a waitlist entry.
+WAITLIST_NAME_SUFFIX: Final[str] = " (Waitlist)"
+
+## Message of the error raised when the My Bookings page shows no booking at all.
+MESSAGE_NO_BOOKINGS_FOUND: Final[str] = "The My Bookings page shows no booking or waitlist entry"
+
+## Lines of the verification on the My Bookings page (lecture steps 7 and 8).
+VERIFY_TITLE: Final[str] = "--- VERIFYING ON MY BOOKINGS PAGE ---"
+VERIFY_LINE_VERIFIED: Final[str] = "  ✓ Verified: {name}"
+VERIFY_RESULT_TITLE: Final[str] = "--- VERIFICATION RESULT ---"
+VERIFY_EXPECTED: Final[str] = "Expected: {count} {noun}"
+VERIFY_FOUND: Final[str] = "Found: {count} {noun}"
+VERIFY_NOUN_SINGULAR: Final[str] = "booking"
+VERIFY_NOUN_PLURAL: Final[str] = "bookings"
+VERIFY_SUCCESS: Final[str] = "✅ SUCCESS: All bookings verified!"
+VERIFY_MISMATCH: Final[str] = "❌ MISMATCH: Missing {count} bookings"
+VERIFY_LINE_MISSING: Final[str] = "  ✗ Missing: {entry}"
+VERIFY_LINE_UNEXPECTED: Final[str] = "  ? Unexpected: {entry}"
