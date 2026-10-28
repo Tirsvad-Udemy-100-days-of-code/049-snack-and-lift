@@ -53,11 +53,22 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - name: Check out the project and its framework submodule
+      - name: Check out the project
         uses: actions/checkout@v4.2.2
         with:
-          submodules: recursive
           token: ${{ secrets.SYNC_TOKEN }}
+
+      # The framework submodule is registered with an SSH address, which the runner
+      # cannot use. The address is rewritten to HTTPS for this step only, and the token
+      # goes in through the environment, never on a command line. .gitmodules stays.
+      - name: Fetch the framework submodule over HTTPS
+        env:
+          GIT_CONFIG_COUNT: "2"
+          GIT_CONFIG_KEY_0: url.https://git.tirsystem.com/.insteadOf
+          GIT_CONFIG_VALUE_0: ssh://git@git.tirsystem.com:10022/
+          GIT_CONFIG_KEY_1: http.https://git.tirsystem.com/.extraheader
+          GIT_CONFIG_VALUE_1: "Authorization: token ${{ secrets.SYNC_TOKEN }}"
+        run: git submodule update --init --recursive
 
       - name: Make sure curl and jq are available
         run: bash framework/scripts/ci-publish-milestones.sh ensure-tools
