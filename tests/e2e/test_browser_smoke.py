@@ -3,6 +3,8 @@
 """
 
 import os
+import tempfile
+from pathlib import Path
 
 import pytest
 from selenium.webdriver.common.by import By
@@ -22,7 +24,7 @@ pytestmark = [
 
 
 def test_gym_home_page_shows_the_login_button() -> None:
-    driver = create_driver(headless=True)
+    driver = create_driver(headless=True, profile_dir=Path(tempfile.mkdtemp()), keep_open=False)
     try:
         driver.get(constants.GYM_URL)
         button = WebDriverWait(driver, constants.WAIT_TIMEOUT_SECONDS).until(
