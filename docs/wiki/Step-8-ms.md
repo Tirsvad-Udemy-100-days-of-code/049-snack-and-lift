@@ -14,6 +14,6 @@ Anda belajar bahawa tarikh ialah punca pepijat biasa: kawalan admin laman "advan
 
 ![Langkah 8: Jaminan kualiti dengan perjalanan masa](https://git.tirsystem.com/Tirsvad-Udemy-100-days-of-code/049-snack-and-lift/raw/branch/main/docs/images/step-8.png)
 
-> Imej ini ialah ilustrasi: bot dijalankan terhadap halaman ujian tempatan projek (`tests/e2e/fixtures`), bukan laman gim sebenar. Larian dengan akaun sebenar dan `--screenshot-dir` (lihat [Mula menggunakan](Getting-Started-ms)) menggantikannya.
+> Ini ialah larian sebenar. Halaman My Bookings turut menyenaraikan tempahan daripada larian terdahulu di luar 7 hari jadual seterusnya, jadi semakan melaporkannya sebagai tidak dijangka dan berakhir dengan MISMATCH. Ini kecacatan yang diketahui pada semakan dan akan dibaiki.
 
 [Sebelumnya: 7](Step-7-ms) · [Utama](Home-ms) · [Seterusnya: 9](Step-9-ms)

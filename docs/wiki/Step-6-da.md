@@ -14,6 +14,4 @@ Du lærer at gennemløbe alle matchende elementer: hvert tirsdags- og torsdagsho
 
 ![Trin 6: Alle tirsdags- og torsdagshold](https://git.tirsystem.com/Tirsvad-Udemy-100-days-of-code/049-snack-and-lift/raw/branch/main/docs/images/step-6.png)
 
-> Dette billede er en illustration: botten kørte mod projektets lokale testsider (`tests/e2e/fixtures`), ikke mod det rigtige gym-site. En kørsel med en rigtig konto og `--screenshot-dir` (se [Kom i gang](Getting-Started-da)) erstatter det.
-
 [Forrige: 5](Step-5-da) · [Forside](Home-da) · [Næste: 7](Step-7-da)

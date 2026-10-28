@@ -14,6 +14,6 @@ You learn that dates are the usual bug: the site's admin control "advance 3 days
 
 ![Step 8: Time travel quality assurance](https://git.tirsystem.com/Tirsvad-Udemy-100-days-of-code/049-snack-and-lift/raw/branch/main/docs/images/step-8.png)
 
-> This image is an illustration: the bot ran against the project's local test pages (`tests/e2e/fixtures`), not against the live gym site. A run with a real account and `--screenshot-dir` (see [Getting started](Getting-Started)) replaces it.
+> This is a real run. The My Bookings page also lists bookings from earlier runs that lie outside the schedule's next 7 days, so the check reports them as unexpected and ends with MISMATCH. This is a known defect of the check, tracked for a fix.
 
 [Previous: 7](Step-7) · [Home](Home) · [Next: 9](Step-9)
