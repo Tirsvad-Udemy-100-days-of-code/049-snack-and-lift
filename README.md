@@ -115,7 +115,7 @@ docker run --rm snack-and-lift
 
 ## 📸 Lecture steps and screenshots
 
-Each step has a wiki page that explains what it teaches, in [English](https://git.tirsystem.com/Tirsvad-Udemy-100-days-of-code/049-snack-and-lift/wiki/Home), [Dansk](https://git.tirsystem.com/Tirsvad-Udemy-100-days-of-code/049-snack-and-lift/wiki/Home-da) and [Bahasa Melayu](https://git.tirsystem.com/Tirsvad-Udemy-100-days-of-code/049-snack-and-lift/wiki/Home-ms). All nine images are screenshots of a real run against the live site. The step 8 image was taken before a fix: it ends in MISMATCH because the My Bookings page also lists bookings from earlier runs. The check now compares only the days of the run, so the same run ends in SUCCESS.
+Each step has a wiki page that explains what it teaches, in [English](https://git.tirsystem.com/Tirsvad-Udemy-100-days-of-code/049-snack-and-lift/wiki/Home), [Dansk](https://git.tirsystem.com/Tirsvad-Udemy-100-days-of-code/049-snack-and-lift/wiki/Home-da) and [Bahasa Melayu](https://git.tirsystem.com/Tirsvad-Udemy-100-days-of-code/049-snack-and-lift/wiki/Home-ms). All nine images are screenshots of a real run against the live site. Step 8 ends in SUCCESS; the My Bookings page also lists bookings from earlier runs, which the check prints as "Also booked (not checked)".
 
 | Step | Wiki page | Screenshot |
 | --- | --- | --- |
