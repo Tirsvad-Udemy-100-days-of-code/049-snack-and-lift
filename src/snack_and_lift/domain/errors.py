@@ -21,3 +21,11 @@ class UnknownButtonError(GymError):
 
 class PageFormatError(GymError):
     """@brief A text read from the page (a day label or a time) has an unexpected format."""
+
+
+class NoBookingsFoundError(GymError):
+    """@brief The My Bookings page shows no booking where the bot expects some.
+
+    The project's counterpart of Selenium's `NoSuchElementException`, which the lecture asks
+    the student to raise when the bookings that should be there are missing.
+    """

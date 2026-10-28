@@ -14,9 +14,11 @@ from snack_and_lift.application.booking import book_next_tuesday, book_target_cl
 from snack_and_lift.application.credentials import Credentials, load_credentials
 from snack_and_lift.application.ports import GymPort
 from snack_and_lift.application.session import login
+from snack_and_lift.application.verification import verify_bookings
 from snack_and_lift.domain.errors import GymError, LoginFailedError, MissingCredentialsError
 from snack_and_lift.domain.models import ClassResult
 from snack_and_lift.domain.report import format_detail_list, format_summary
+from snack_and_lift.domain.verification import format_verification
 from snack_and_lift.infrastructure.browser import create_driver, default_profile_dir
 from snack_and_lift.infrastructure.console_recorder import ConsoleRecorder
 from snack_and_lift.infrastructure.selenium_gym import SeleniumGym
@@ -47,6 +49,10 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         prog="snack-and-lift",
         description="Books the Tuesday and Thursday 6pm classes at the Snack and Lift gym.",
+        epilog=(
+            "exit codes: 0 done, 1 a step failed, 2 credentials missing, "
+            "3 the My Bookings page does not match the bookings made"
+        ),
     )
     parser.add_argument(
         "--headless",
@@ -74,7 +80,7 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
     parser.add_argument(
         "--first-tuesday-only",
         action="store_true",
-        help="book only the next Tuesday 6pm class (lecture steps 3 and 4)",
+        help="book only the next Tuesday 6pm class (lecture steps 3 and 4); skips the verification",
     )
     args = parser.parse_args(argv)
     if args.keep_open is None:
@@ -116,17 +122,18 @@ def _save_console(gym: GymPort, screenshot_dir: Path | None, text: str, name: st
 
 def _run(
     gym: GymPort, args: argparse.Namespace, recorder: ConsoleRecorder, credentials: Credentials
-) -> None:
-    """@brief Open the site, log in and book the classes, saving the step images.
+) -> bool:
+    """@brief Open the site, log in, book the classes and verify them, saving the step images.
 
-    Books every Tuesday and Thursday 6pm class and logs the summary and the detailed list;
-    with `--first-tuesday-only` it books the next Tuesday class only.
-
+    Books every Tuesday and Thursday 6pm class, logs the summary and the detailed list and
+    verifies the bookings on the My Bookings page; with `--first-tuesday-only` it books the
+    next Tuesday class only and does not verify.
 
     @param gym The gym site.
     @param args The parsed options.
     @param recorder The recorded console lines, drawn for step 4.
     @param credentials The account to log in with.
+    @return False when the My Bookings page does not match the bookings made, else True.
     @exception GymError A step failed.
     """
     gym.open_site()
@@ -137,7 +144,7 @@ def _run(
         book_next_tuesday(gym)
         _save_step(gym, args.screenshot_dir, constants.SCREENSHOT_STEP_3)
         _save_console(gym, args.screenshot_dir, recorder.text, constants.SCREENSHOT_STEP_4)
-        return
+        return True
     window_saved = False
 
     def save_window_once(_: ClassResult) -> None:
@@ -156,6 +163,12 @@ def _run(
     detail = format_detail_list(results)
     logger.info("%s", detail)
     _save_console(gym, args.screenshot_dir, f"{summary}\n{detail}", constants.SCREENSHOT_STEP_6)
+    verification = verify_bookings(gym, results)
+    _save_step(gym, args.screenshot_dir, constants.SCREENSHOT_STEP_7)
+    verification_text = format_verification(verification)
+    logger.info("%s", verification_text)
+    _save_console(gym, args.screenshot_dir, verification_text, constants.SCREENSHOT_STEP_8)
+    return verification.is_success
 
 
 def main(
@@ -166,7 +179,7 @@ def main(
 
     @param argv Arguments without the program name; None reads `sys.argv`.
     @param gym_factory Builds the gym site; tests pass a fake.
-    @return Process exit code: 0 done, 1 a step failed, 2 credentials missing.
+    @return Process exit code: 0 done, 1 a step failed, 2 credentials missing, 3 mismatch.
     """
     logging.basicConfig(level=logging.INFO, format="%(message)s")
     root = logging.getLogger()
@@ -196,7 +209,7 @@ def _main(argv: Sequence[str] | None, gym_factory: GymFactory, recorder: Console
         return 2
     gym = gym_factory(args.headless, args.profile_dir, args.keep_open)
     try:
-        _run(gym, args, recorder, credentials)
+        verified = _run(gym, args, recorder, credentials)
     except LoginFailedError as error:
         logger.error("Login failed: %s", error)
         return 1
@@ -206,4 +219,4 @@ def _main(argv: Sequence[str] | None, gym_factory: GymFactory, recorder: Console
     finally:
         if not args.keep_open:
             gym.close()
-    return 0
+    return 0 if verified else constants.EXIT_VERIFICATION_MISMATCH

@@ -3,13 +3,15 @@
 """
 
 import os
-from collections.abc import Iterator
+from collections.abc import Callable, Iterator
 from pathlib import Path
 
 import pytest
 
 from snack_and_lift.application.booking import book_target_classes
-from snack_and_lift.domain.errors import GymError, LoginFailedError
+from snack_and_lift.application.verification import get_my_bookings
+from snack_and_lift.domain.booking_entry import BookingEntry
+from snack_and_lift.domain.errors import GymError, LoginFailedError, NoBookingsFoundError
 from snack_and_lift.domain.models import Outcome
 from snack_and_lift.infrastructure.browser import create_driver
 from snack_and_lift.infrastructure.selenium_gym import SeleniumGym
@@ -126,3 +128,63 @@ def test_book_target_classes_books_every_tuesday_and_thursday_class(
         ("201", Outcome.ALREADY_WAITLISTED),
         ("302", Outcome.NEW_BOOKING),
     ]
+
+
+FIXTURE_MY_BOOKINGS = (Path(__file__).parent / "fixtures" / "my_bookings.html").as_uri()
+
+
+@pytest.fixture
+def open_my_bookings_page(tmp_path: Path) -> Iterator[Callable[[str], SeleniumGym]]:
+    """@brief Opens the My Bookings fixture in the given state (a query such as `?state=empty`)."""
+    driver = create_driver(headless=True, profile_dir=tmp_path / "profile", keep_open=False)
+
+    def open_page(query: str = "") -> SeleniumGym:
+        driver.get(FIXTURE_MY_BOOKINGS + query)
+        return SeleniumGym(driver, base_url=FIXTURE_MY_BOOKINGS)
+
+    try:
+        yield open_page
+    finally:
+        driver.quit()
+
+
+def test_open_my_bookings_follows_the_nav_link(schedule_gym: SeleniumGym) -> None:
+    schedule_gym.open_my_bookings()
+
+    assert [entry.name for entry in schedule_gym.list_my_bookings()] == [
+        "Spin Class",
+        "Yoga Class",
+        "HIIT Class",
+    ]
+
+
+def test_list_my_bookings_reads_confirmed_and_waitlist_entries(
+    open_my_bookings_page: Callable[[str], SeleniumGym],
+) -> None:
+    entries = open_my_bookings_page("").list_my_bookings()
+
+    assert entries == [
+        BookingEntry("Spin Class", "Tue, Aug 12, 6:00 PM", False),
+        BookingEntry("Yoga Class", "Wed, Aug 13, 7:00 AM", False),
+        BookingEntry("HIIT Class", "Thu, Aug 14, 6:00 PM", True),
+    ]
+
+
+def test_list_my_bookings_returns_nothing_for_the_empty_state(
+    open_my_bookings_page: Callable[[str], SeleniumGym],
+) -> None:
+    assert open_my_bookings_page("?state=empty").list_my_bookings() == []
+
+
+def test_get_my_bookings_raises_for_the_empty_state(
+    open_my_bookings_page: Callable[[str], SeleniumGym],
+) -> None:
+    with pytest.raises(NoBookingsFoundError):
+        get_my_bookings(open_my_bookings_page("?state=empty"))
+
+
+def test_list_my_bookings_raises_with_the_text_of_the_error_box(
+    open_my_bookings_page: Callable[[str], SeleniumGym],
+) -> None:
+    with pytest.raises(GymError, match="Failed to load bookings"):
+        open_my_bookings_page("?state=error").list_my_bookings()
