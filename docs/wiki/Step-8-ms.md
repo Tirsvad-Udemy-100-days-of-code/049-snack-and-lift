@@ -14,6 +14,6 @@ Anda belajar bahawa tarikh ialah punca pepijat biasa: kawalan admin laman "advan
 
 ![Langkah 8: Jaminan kualiti dengan perjalanan masa](https://git.tirsystem.com/Tirsvad-Udemy-100-days-of-code/049-snack-and-lift/raw/branch/main/docs/images/step-8.png)
 
-> Tangkapan skrin ini memerlukan larian dengan akaun gim sebenar. Penyelenggara menambahnya dengan `--screenshot-dir` (lihat [Mula menggunakan](Getting-Started-ms)); sehingga itu fail `docs/images/step-8.png` tiada dan imej di atas tidak dipaparkan.
+> Imej ini ialah ilustrasi: bot dijalankan terhadap halaman ujian tempatan projek (`tests/e2e/fixtures`), bukan laman gim sebenar. Larian dengan akaun sebenar dan `--screenshot-dir` (lihat [Mula menggunakan](Getting-Started-ms)) menggantikannya.
 
 [Sebelumnya: 7](Step-7-ms) · [Utama](Home-ms) · [Seterusnya: 9](Step-9-ms)

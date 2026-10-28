@@ -8,7 +8,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     SNACK_AND_LIFT_E2E=1
 
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends chromium chromium-driver fonts-liberation fonts-noto-color-emoji \
+    && apt-get install -y --no-install-recommends chromium chromium-driver fonts-liberation fonts-dejavu-core fonts-noto-color-emoji \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
