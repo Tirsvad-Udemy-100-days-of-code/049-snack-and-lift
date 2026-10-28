@@ -24,6 +24,27 @@ TARGET_WEEKDAYS: Final[tuple[str, ...]] = ("Tue", "Thu")
 ## Id of the login button in the navigation bar of the site (the home page has no title).
 NAV_LOGIN_BUTTON_ID: Final[str] = "login-button"
 
+## Id of the e-mail field of the login form.
+LOGIN_EMAIL_INPUT_ID: Final[str] = "email-input"
+
+## Id of the password field of the login form.
+LOGIN_PASSWORD_INPUT_ID: Final[str] = "password-input"
+
+## Id of the submit button of the login form.
+LOGIN_SUBMIT_BUTTON_ID: Final[str] = "submit-button"
+
+## Id of the element that shows a login error.
+ERROR_MESSAGE_ID: Final[str] = "error-message"
+
+## Id of the class schedule page, shown after a successful login.
+SCHEDULE_PAGE_ID: Final[str] = "schedule-page"
+
+## Name of the environment variable that holds the account e-mail.
+ACCOUNT_EMAIL_ENV: Final[str] = "SNACK_AND_LIFT_EMAIL"
+
+## Name of the environment variable that holds the account password.
+ACCOUNT_PASSWORD_ENV: Final[str] = "SNACK_AND_LIFT_PASSWORD"
+
 ## Folder where screenshots of a container run are written.
 SCREENSHOT_DIR: Final[str] = "docs/images"
 

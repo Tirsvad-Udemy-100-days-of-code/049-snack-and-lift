@@ -75,6 +75,24 @@ Leave the environment with `deactivate`. The folder `.venv` is ignored by git.
 
 ## ▶️ Run
 
+### Your gym account
+
+The bot never contains a password. Register your own account once, by hand, as the lecture does: run the bot with `--keep-open` so Chrome stays open (the `chrome_profile` folder keeps the site's data between runs), click "Join Today... Or Tomorrow" and register with an e-mail such as `yourname@test.com` and a password you remember (not a trivial one such as `12346`, Chrome warns about those). Then give the bot the account through two environment variables:
+
+```bash
+# Linux and macOS
+export SNACK_AND_LIFT_EMAIL="yourname@test.com"
+export SNACK_AND_LIFT_PASSWORD="your password"
+```
+
+```powershell
+# Windows PowerShell
+$env:SNACK_AND_LIFT_EMAIL = "yourname@test.com"
+$env:SNACK_AND_LIFT_PASSWORD = "your password"
+```
+
+### Start the bot
+
 With the environment active:
 
 ```bash
