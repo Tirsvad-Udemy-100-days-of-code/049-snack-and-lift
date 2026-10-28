@@ -14,7 +14,8 @@
 # Copy it to .gitea/workflows/sync-milestones.yml (Gitea Actions) or
 # .github/workflows/sync-milestones.yml (GitHub Actions). Then:
 #   1. Create a CI secret and put its name in the two `secrets.` lines below
-#      (SYNC_TOKEN is a placeholder). Gitea does not accept secret names that
+#      (TOKEN_FOR_GITEA_ISSUES is the name the
+#      framework uses). Gitea does not accept secret names that
 #      start with GITEA_ or GITHUB_.
 #   2. Give the token the smallest scope that works: read and write on issues
 #      and milestones. If the framework submodule is a private repository, the
@@ -53,21 +54,32 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - name: Check out the project and its framework submodule
+      - name: Check out the project
         uses: actions/checkout@v4.2.2
         with:
-          submodules: recursive
-          token: ${{ secrets.SYNC_TOKEN }}
+          token: ${{ secrets.TOKEN_FOR_GITEA_ISSUES }}
+
+      # The framework submodule is registered with an SSH address, which the runner
+      # cannot use. The address is rewritten to HTTPS for this step only, and the token
+      # goes in through the environment, never on a command line. .gitmodules stays.
+      - name: Fetch the framework submodule over HTTPS
+        env:
+          GIT_CONFIG_COUNT: "2"
+          GIT_CONFIG_KEY_0: url.https://git.tirsystem.com/.insteadOf
+          GIT_CONFIG_VALUE_0: ssh://git@git.tirsystem.com:10022/
+          GIT_CONFIG_KEY_1: http.https://git.tirsystem.com/.extraheader
+          GIT_CONFIG_VALUE_1: "Authorization: token ${{ secrets.TOKEN_FOR_GITEA_ISSUES }}"
+        run: git submodule update --init --recursive
 
       - name: Make sure curl and jq are available
         run: bash framework/scripts/ci-publish-milestones.sh ensure-tools
 
       - name: Publish accepted milestones
         env:
-          # Gitea reads GITEA_TOKEN, GitHub's gh reads GH_TOKEN; both come from
-          # the one secret named above.
-          GITEA_TOKEN: ${{ secrets.SYNC_TOKEN }}
-          GH_TOKEN: ${{ secrets.SYNC_TOKEN }}
+          # Gitea reads TOKEN_FOR_GITEA_ISSUES, GitHub's gh reads GH_TOKEN; both
+          # come from the one secret named above.
+          TOKEN_FOR_GITEA_ISSUES: ${{ secrets.TOKEN_FOR_GITEA_ISSUES }}
+          GH_TOKEN: ${{ secrets.TOKEN_FOR_GITEA_ISSUES }}
           # Empty on a push (a real run); "true" or "false" on a manual run.
           DRY_RUN: ${{ inputs.dry_run }}
         run: bash framework/scripts/ci-publish-milestones.sh publish
