@@ -1,0 +1,73 @@
+# Publish accepted milestones to the git host.
+#
+# On a push to main that changes docs/milestones/ or docs/sqa/reviews/, this
+# workflow runs `sync-project.sh --accepted-only --apply`: every milestone whose
+# latest Version History row is Accepted and whose latest review record is a Go
+# is created or updated as a Milestone with its tasks as Issues. A Proposed
+# milestone, or one without a Go review, is skipped. Nothing is closed or
+# deleted. Each run updates the issues of every accepted milestone (the sync is
+# idempotent, but the host records the edit).
+#
+# INSTALLING THIS FILE IS THE STANDING AUTHORIZATION TO PUBLISH. A project opts
+# in by copying it; an agent does not install it on its own.
+#
+# Copy it to .gitea/workflows/sync-milestones.yml (Gitea Actions) or
+# .github/workflows/sync-milestones.yml (GitHub Actions). Then:
+#   1. Create a CI secret and put its name in the two `secrets.` lines below
+#      (SYNC_TOKEN is a placeholder). Gitea does not accept secret names that
+#      start with GITEA_ or GITHUB_.
+#   2. Give the token the smallest scope that works: read and write on issues
+#      and milestones. If the framework submodule is a private repository, the
+#      token must also be able to read it (it is used to check it out).
+#   3. Run it once by hand from the Actions page with dry_run left on: it prints
+#      the plan and creates nothing. Turn dry_run off only for a real run.
+# A runner must be registered for the repository (or its organisation).
+#
+# The steps are one command each: the logic is framework/scripts/ci-publish-milestones.sh,
+# a file that is linted and tested (QC-WF-001 criterion 20).
+
+name: Publish accepted milestones
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "docs/milestones/**"
+      - "docs/sqa/reviews/**"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Preview only: print the plan and create nothing"
+        type: boolean
+        default: true
+
+# Two merges in a row queue instead of racing.
+concurrency:
+  group: publish-accepted-milestones
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out the project and its framework submodule
+        uses: actions/checkout@v4.2.2
+        with:
+          submodules: recursive
+          token: ${{ secrets.SYNC_TOKEN }}
+
+      - name: Make sure curl and jq are available
+        run: bash framework/scripts/ci-publish-milestones.sh ensure-tools
+
+      - name: Publish accepted milestones
+        env:
+          # Gitea reads GITEA_TOKEN, GitHub's gh reads GH_TOKEN; both come from
+          # the one secret named above.
+          GITEA_TOKEN: ${{ secrets.SYNC_TOKEN }}
+          GH_TOKEN: ${{ secrets.SYNC_TOKEN }}
+          # Empty on a push (a real run); "true" or "false" on a manual run.
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: bash framework/scripts/ci-publish-milestones.sh publish

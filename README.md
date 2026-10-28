@@ -8,6 +8,7 @@ A Selenium bot that books classes at the fictional gym "Snack and Lift" for you:
 - [Requirements](#-requirements)
 - [Setup](#-setup)
 - [Run](#-run)
+- [Lecture steps and screenshots](#-lecture-steps-and-screenshots)
 - [Tests](#-tests)
 - [License](#-license)
 - [Links](#-links)
@@ -111,6 +112,22 @@ To keep your desktop free, run it in the Docker container (headless Chromium):
 docker build -t snack-and-lift .
 docker run --rm snack-and-lift
 ```
+
+## 📸 Lecture steps and screenshots
+
+Each step has a wiki page that explains what it teaches, in [English](https://git.tirsystem.com/Tirsvad-Udemy-100-days-of-code/049-snack-and-lift/wiki/Home), [Dansk](https://git.tirsystem.com/Tirsvad-Udemy-100-days-of-code/049-snack-and-lift/wiki/Home-da) and [Bahasa Melayu](https://git.tirsystem.com/Tirsvad-Udemy-100-days-of-code/049-snack-and-lift/wiki/Home-ms). Only the screenshot of step 1 is in the repository yet: the others need a run with a real gym account, which the maintainer makes with `--screenshot-dir` (see [Getting started](https://git.tirsystem.com/Tirsvad-Udemy-100-days-of-code/049-snack-and-lift/wiki/Getting-Started)). Until then their images do not show.
+
+| Step | Wiki page | Screenshot |
+| --- | --- | --- |
+| 1 | [Setup and navigation](https://git.tirsystem.com/Tirsvad-Udemy-100-days-of-code/049-snack-and-lift/wiki/Step-1) | ![Step 1](https://git.tirsystem.com/Tirsvad-Udemy-100-days-of-code/049-snack-and-lift/raw/branch/main/docs/images/step-1.png) |
+| 2 | [Automated login](https://git.tirsystem.com/Tirsvad-Udemy-100-days-of-code/049-snack-and-lift/wiki/Step-2) | ![Step 2](https://git.tirsystem.com/Tirsvad-Udemy-100-days-of-code/049-snack-and-lift/raw/branch/main/docs/images/step-2.png) |
+| 3 | [Book the next Tuesday class](https://git.tirsystem.com/Tirsvad-Udemy-100-days-of-code/049-snack-and-lift/wiki/Step-3) | ![Step 3](https://git.tirsystem.com/Tirsvad-Udemy-100-days-of-code/049-snack-and-lift/raw/branch/main/docs/images/step-3.png) |
+| 4 | [Check if a class is booked](https://git.tirsystem.com/Tirsvad-Udemy-100-days-of-code/049-snack-and-lift/wiki/Step-4) | ![Step 4](https://git.tirsystem.com/Tirsvad-Udemy-100-days-of-code/049-snack-and-lift/raw/branch/main/docs/images/step-4.png) |
+| 5 | [Counters and summary](https://git.tirsystem.com/Tirsvad-Udemy-100-days-of-code/049-snack-and-lift/wiki/Step-5) | ![Step 5](https://git.tirsystem.com/Tirsvad-Udemy-100-days-of-code/049-snack-and-lift/raw/branch/main/docs/images/step-5.png) |
+| 6 | [Every Tuesday and Thursday class](https://git.tirsystem.com/Tirsvad-Udemy-100-days-of-code/049-snack-and-lift/wiki/Step-6) | ![Step 6](https://git.tirsystem.com/Tirsvad-Udemy-100-days-of-code/049-snack-and-lift/raw/branch/main/docs/images/step-6.png) |
+| 7 | [Verify on My Bookings](https://git.tirsystem.com/Tirsvad-Udemy-100-days-of-code/049-snack-and-lift/wiki/Step-7) | ![Step 7](https://git.tirsystem.com/Tirsvad-Udemy-100-days-of-code/049-snack-and-lift/raw/branch/main/docs/images/step-7.png) |
+| 8 | [Time travel QA](https://git.tirsystem.com/Tirsvad-Udemy-100-days-of-code/049-snack-and-lift/wiki/Step-8) | ![Step 8](https://git.tirsystem.com/Tirsvad-Udemy-100-days-of-code/049-snack-and-lift/raw/branch/main/docs/images/step-8.png) |
+| 9 | [Resilience (retry)](https://git.tirsystem.com/Tirsvad-Udemy-100-days-of-code/049-snack-and-lift/wiki/Step-9) | ![Step 9](https://git.tirsystem.com/Tirsvad-Udemy-100-days-of-code/049-snack-and-lift/raw/branch/main/docs/images/step-9.png) |
 
 ## 🧪 Tests
 
