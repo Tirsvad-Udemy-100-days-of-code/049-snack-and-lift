@@ -17,6 +17,7 @@ __all__ = [
     "Action",
     "decide_outcome_action",
     "find_next_class",
+    "find_target_classes",
     "format_outcome",
     "is_target_time",
     "parse_day_label",
@@ -114,6 +115,25 @@ def find_next_class(cards: Iterable[ClassCard], weekday: str) -> ClassCard | Non
         if card.weekday == weekday and is_target_time(card):
             return card
     return None
+
+
+def find_target_classes(cards: Iterable[ClassCard]) -> list[ClassCard]:
+    """@brief Find every class on a target weekday at the target time, in page order.
+
+    The weekday is read from each card's day label; the position in the list means nothing.
+    Classes already completed are skipped.
+
+    @param cards The classes in the order of the page.
+    @return The classes to handle; empty when there is none.
+    @exception PageFormatError A day label or time text is not valid.
+    """
+    return [
+        card
+        for card in cards
+        if card.state is not ButtonState.COMPLETED
+        and card.weekday in constants.TARGET_WEEKDAYS
+        and is_target_time(card)
+    ]
 
 
 def decide_outcome_action(card: ClassCard) -> Action:

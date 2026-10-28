@@ -8,7 +8,11 @@ import pytest
 from tests.unit.fakes import FakeGym
 from tests.unit.test_models import make_card
 
-from snack_and_lift.application.booking import book_class, book_next_tuesday
+from snack_and_lift.application.booking import (
+    book_class,
+    book_next_tuesday,
+    book_target_classes,
+)
 from snack_and_lift.domain.errors import GymError, UnknownButtonError
 from snack_and_lift.domain.models import Outcome
 
@@ -95,3 +99,52 @@ def test_book_next_tuesday_logs_when_there_is_no_class(caplog: pytest.LogCapture
 
     assert "No Tue class at 18:00 found" in caplog.text
     assert gym.pressed == []
+
+
+def test_book_target_classes_handles_every_target_class_in_order() -> None:
+    cards = [
+        make_card("Today (Wed, Aug 13)", card_id="1"),
+        make_card("Tomorrow (Thu, Aug 14)", card_id="2"),
+        make_card("Tue, Aug 19", card_id="3", button_text="Join Waitlist"),
+        make_card("Thu, Aug 21", card_id="4", button_text="Booked"),
+        make_card("Tue, Aug 26", card_id="5", button_text="Waitlisted"),
+    ]
+    gym = FakeGym(cards=cards)
+
+    results = book_target_classes(gym)
+
+    assert [result.outcome for result in results] == [
+        Outcome.NEW_BOOKING,
+        Outcome.NEW_WAITLIST,
+        Outcome.ALREADY_BOOKED,
+        Outcome.ALREADY_WAITLISTED,
+    ]
+    assert gym.pressed == ["2", "3"]
+    assert gym.calls.count("list_class_cards") == 1
+
+
+def test_book_target_classes_calls_back_after_each_class() -> None:
+    gym = FakeGym(
+        cards=[make_card("Thu, Aug 14", card_id="1"), make_card("Tue, Aug 19", card_id="2")]
+    )
+    seen: list[str] = []
+
+    book_target_classes(gym, lambda result: seen.append(result.card.card_id))
+
+    assert seen == ["1", "2"]
+
+
+def test_book_target_classes_logs_when_there_is_none(caplog: pytest.LogCaptureFixture) -> None:
+    gym = FakeGym(cards=[make_card("Wed, Aug 13")])
+
+    with caplog.at_level(logging.INFO):
+        assert book_target_classes(gym) == []
+
+    assert "No Tuesday or Thursday class at 18:00 found" in caplog.text
+
+
+def test_book_target_classes_propagates_a_failing_class() -> None:
+    gym = FakeGym(cards=[make_card("Thu, Aug 14")], press_error="Network down")
+
+    with pytest.raises(GymError, match="Network down"):
+        book_target_classes(gym)

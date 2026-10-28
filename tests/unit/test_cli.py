@@ -2,6 +2,7 @@
 @brief The command line accepts its options and the entry point wires the use case.
 """
 
+import logging
 from pathlib import Path
 
 import pytest
@@ -67,7 +68,11 @@ def test_main_saves_both_screenshots_on_success(tmp_path: Path) -> None:
         tmp_path / "step-2.png",
         tmp_path / "step-3.png",
     ]
-    assert [path for _, path in gym.text_screenshots] == [tmp_path / "step-4.png"]
+    assert [path for _, path in gym.text_screenshots] == [
+        tmp_path / "step-4.png",
+        tmp_path / "step-5.png",
+        tmp_path / "step-6.png",
+    ]
     assert gym.calls == [
         "open_site",
         "save_screenshot",
@@ -75,6 +80,8 @@ def test_main_saves_both_screenshots_on_success(tmp_path: Path) -> None:
         "save_screenshot",
         "list_class_cards",
         "save_screenshot",
+        "save_text_screenshot",
+        "save_text_screenshot",
         "save_text_screenshot",
     ]
 
@@ -89,6 +96,94 @@ def test_main_books_the_class_and_draws_the_console_text(tmp_path: Path) -> None
     text, _ = gym.text_screenshots[0]
     assert "✓ Logged in" in text
     assert "✓ Successfully booked: Spin Class on Tue, Aug 19" in text
+
+
+@pytest.mark.usefixtures("credentials_env")
+def test_main_books_every_target_class_and_logs_the_report(
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    gym = FakeGym(
+        cards=[
+            make_card("Tomorrow (Thu, Aug 14)", card_id="1"),
+            make_card("Fri, Aug 15", card_id="2"),
+            make_card("Tue, Aug 19", card_id="3", button_text="Join Waitlist"),
+        ]
+    )
+
+    with caplog.at_level(logging.INFO):
+        assert main([], lambda *_: gym) == 0
+
+    assert gym.pressed == ["1", "3"]
+    assert "New bookings: 1\nNew waitlist entries: 1\nAlready booked/waitlisted: 0" in caplog.text
+    assert "Total Tuesday & Thursday 6pm classes: 2" in caplog.text
+    assert "  • [New Booking] Spin Class on Tomorrow (Thu, Aug 14)" in caplog.text
+    assert "  • [New Waitlist] Spin Class on Tue, Aug 19" in caplog.text
+
+
+@pytest.mark.usefixtures("credentials_env")
+def test_main_saves_step_3_after_the_first_class_and_the_report_images(tmp_path: Path) -> None:
+    gym = FakeGym(
+        cards=[make_card("Thu, Aug 14", card_id="1"), make_card("Tue, Aug 19", card_id="2")]
+    )
+
+    assert main(["--screenshot-dir", str(tmp_path)], lambda *_: gym) == 0
+
+    assert gym.calls == [
+        "open_site",
+        "save_screenshot",
+        "log_in",
+        "save_screenshot",
+        "list_class_cards",
+        "press_class_button",
+        "save_screenshot",
+        "press_class_button",
+        "save_text_screenshot",
+        "save_text_screenshot",
+        "save_text_screenshot",
+    ]
+    assert gym.screenshots[-1] == tmp_path / "step-3.png"
+    (_, _), (step_5, _), (step_6, _) = gym.text_screenshots
+    assert step_5.startswith("--- BOOKING SUMMARY ---\nNew bookings: 2")
+    assert "--- DETAILED CLASS LIST ---" not in step_5
+    assert step_6.startswith(step_5)
+    assert "--- DETAILED CLASS LIST ---\n  • [New Booking] Spin Class on Thu, Aug 14" in step_6
+
+
+@pytest.mark.usefixtures("credentials_env")
+def test_main_logs_an_empty_report_without_target_classes(
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    gym = FakeGym(cards=[make_card("Wed, Aug 13")])
+
+    with caplog.at_level(logging.INFO):
+        assert main([], lambda *_: gym) == 0
+
+    assert "Total Tuesday & Thursday 6pm classes: 0" in caplog.text
+    assert "No matching class found" in caplog.text
+
+
+@pytest.mark.usefixtures("credentials_env")
+def test_main_first_tuesday_only_books_one_class_and_no_report(
+    tmp_path: Path, caplog: pytest.LogCaptureFixture
+) -> None:
+    gym = FakeGym(
+        cards=[make_card("Thu, Aug 14", card_id="1"), make_card("Tue, Aug 19", card_id="2")]
+    )
+
+    with caplog.at_level(logging.INFO):
+        code = main(["--first-tuesday-only", "--screenshot-dir", str(tmp_path)], lambda *_: gym)
+
+    assert code == 0
+    assert gym.pressed == ["2"]
+    assert "BOOKING SUMMARY" not in caplog.text
+    assert [path.name for path in gym.screenshots] == ["step-1.png", "step-2.png", "step-3.png"]
+    assert [path.name for _, path in gym.text_screenshots] == ["step-4.png"]
+
+
+@pytest.mark.usefixtures("credentials_env")
+def test_first_tuesday_only_flag_is_read() -> None:
+    assert parse_args(["--first-tuesday-only"]).first_tuesday_only is True
+    assert parse_args([]).first_tuesday_only is False
 
 
 @pytest.mark.usefixtures("credentials_env")

@@ -112,9 +112,35 @@ MESSAGE_ALREADY_BOOKED: Final[str] = "✓ Already booked: {name} on {day}"
 MESSAGE_ALREADY_WAITLISTED: Final[str] = "✓ Already on waitlist: {name} on {day}"
 MESSAGE_NO_CLASS_FOUND: Final[str] = "No {weekday} class at {time} found on the schedule"
 
-## File names of the screenshots of lecture steps 3 and 4.
+## Logged when the schedule has no class on a target weekday at the target time.
+MESSAGE_NO_TARGET_CLASSES: Final[str] = (
+    "No Tuesday or Thursday class at {time} found on the schedule"
+)
+
+## Time of the target classes as written in messages (24-hour clock).
+TARGET_TIME_TEXT: Final[str] = f"{TARGET_HOUR:02d}:{TARGET_MINUTE:02d}"
+
+## Lines of the booking summary (lecture step 5).
+SUMMARY_TITLE: Final[str] = "--- BOOKING SUMMARY ---"
+SUMMARY_NEW_BOOKINGS: Final[str] = "New bookings: {count}"
+SUMMARY_NEW_WAITLIST: Final[str] = "New waitlist entries: {count}"
+SUMMARY_ALREADY_DONE: Final[str] = "Already booked/waitlisted: {count}"
+SUMMARY_TOTAL: Final[str] = "Total Tuesday & Thursday 6pm classes: {count}"
+
+## Lines of the detailed class list (lecture step 6).
+DETAIL_TITLE: Final[str] = "--- DETAILED CLASS LIST ---"
+DETAIL_LINE: Final[str] = "  • [{tag}] {name} on {day}"
+DETAIL_NONE: Final[str] = "  No matching class found"
+DETAIL_TAG_NEW_BOOKING: Final[str] = "New Booking"
+DETAIL_TAG_NEW_WAITLIST: Final[str] = "New Waitlist"
+DETAIL_TAG_ALREADY_BOOKED: Final[str] = "Already Booked"
+DETAIL_TAG_ALREADY_WAITLISTED: Final[str] = "Already Waitlisted"
+
+## File names of the screenshots of lecture steps 3 to 6.
 SCREENSHOT_STEP_3: Final[str] = "step-3.png"
 SCREENSHOT_STEP_4: Final[str] = "step-4.png"
+SCREENSHOT_STEP_5: Final[str] = "step-5.png"
+SCREENSHOT_STEP_6: Final[str] = "step-6.png"
 
 ## `string.Template` of the page that renders console text for a screenshot.
 CONSOLE_PAGE_TEMPLATE: Final[str] = (

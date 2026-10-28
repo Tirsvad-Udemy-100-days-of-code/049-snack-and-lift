@@ -1,8 +1,9 @@
 """@file booking.py
-@brief Lecture steps 3 and 4: book the next Tuesday 6pm class and report its state.
+@brief Lecture steps 3 to 6: book the Tuesday and Thursday 6pm classes and report their state.
 """
 
 import logging
+from collections.abc import Callable
 
 from snack_and_lift import constants
 from snack_and_lift.application.ports import GymPort
@@ -13,6 +14,7 @@ from snack_and_lift.domain.rules import (
     OUTCOME_OF_ACTION,
     decide_outcome_action,
     find_next_class,
+    find_target_classes,
     format_outcome,
 )
 
@@ -51,8 +53,33 @@ def book_next_tuesday(gym: GymPort) -> ClassResult | None:
         logger.warning(
             constants.MESSAGE_NO_CLASS_FOUND.format(
                 weekday=constants.NEXT_CLASS_WEEKDAY,
-                time=f"{constants.TARGET_HOUR:02d}:{constants.TARGET_MINUTE:02d}",
+                time=constants.TARGET_TIME_TEXT,
             )
         )
         return None
     return book_class(gym, card)
+
+
+def book_target_classes(
+    gym: GymPort, on_result: Callable[[ClassResult], None] | None = None
+) -> list[ClassResult]:
+    """@brief Book every Tuesday and Thursday class at the target time, in page order.
+
+    The cards are listed once; each class is found again by its id when it is pressed.
+
+    @param gym The gym site.
+    @param on_result Called after each class was handled, for example to take a screenshot.
+    @return What happened to each class; empty when the schedule has none.
+    @exception GymError The page could not be read or a booking failed.
+    """
+    cards = find_target_classes(gym.list_class_cards())
+    if not cards:
+        logger.warning(constants.MESSAGE_NO_TARGET_CLASSES.format(time=constants.TARGET_TIME_TEXT))
+        return []
+    results: list[ClassResult] = []
+    for card in cards:
+        result = book_class(gym, card)
+        results.append(result)
+        if on_result is not None:
+            on_result(result)
+    return results
