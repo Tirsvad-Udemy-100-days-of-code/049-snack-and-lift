@@ -14,6 +14,6 @@ You learn to loop over all matching elements: every Tuesday and Thursday 6pm cla
 
 ![Step 6: Every Tuesday and Thursday class](https://git.tirsystem.com/Tirsvad-Udemy-100-days-of-code/049-snack-and-lift/raw/branch/main/docs/images/step-6.png)
 
-> This screenshot needs a run with a real gym account. The maintainer adds it with `--screenshot-dir` (see [Getting started](Getting-Started)); until then the file `docs/images/step-6.png` is missing and the image above does not show.
+> This image is an illustration: the bot ran against the project's local test pages (`tests/e2e/fixtures`), not against the live gym site. A run with a real account and `--screenshot-dir` (see [Getting started](Getting-Started)) replaces it.
 
 [Previous: 5](Step-5) · [Home](Home) · [Next: 7](Step-7)
