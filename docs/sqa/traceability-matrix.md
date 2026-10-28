@@ -23,7 +23,7 @@ Tracks backward and forward links between artifact instances so that the Busines
 | --- | --- | --- | --- | --- | --- | --- |
 | [BC-001] | Business Case | en | it | - | [SA-001], [PP-001] | RC-001 |
 | [SA-001] | Stakeholder Analysis | en | it | [BC-001] | [PP-001] | RC-002 |
-| [PP-001] | Project Plan | en | it | [BC-001], [SA-001] | [MIL-001] to [MIL-009] | RC-003 |
+| [PP-001] | Project Plan | en | it | [BC-001], [SA-001] | [MIL-001] to [MIL-010] | RC-003 |
 | [DICT-001] | Domain Dictionary | en | it | [BC-001], [SA-001] | - | RC-004 |
 | [ADR-0001] | ADR | - | - | [BC-001] | [PP-001] | RC-005 |
 | [ADR-0002] | ADR | - | - | [BC-001], [SA-001] | code from MIL-002 onward | RC-006 |
@@ -37,6 +37,7 @@ Tracks backward and forward links between artifact instances so that the Busines
 | [MIL-007] | Milestone | en | it | [BC-001], [PP-001] | [MIL-008] | RC-014 |
 | [MIL-008] | Milestone | en | it | [BC-001], [PP-001] | - | RC-015 |
 | [MIL-009] | Milestone | en | it | [BC-001], [MIL-006] | - | RC-023 |
+| [MIL-010] | Milestone | en | it | [BC-001], [MIL-003] | - | RC-025 |
 | Source and tests of [MIL-002] | Python source code | - | - | [MIL-002], [ADR-0002], [ADR-0003] | - | RC-016 |
 | Source and tests of [MIL-003] | Python source code | - | - | [MIL-003], [ADR-0002], [ADR-0003] | - | RC-017 (Go-with-conditions) |
 | Source and tests of [MIL-004] | Python source code | - | - | [MIL-004], [ADR-0002] | - | RC-018 (Go-with-conditions) |
@@ -77,4 +78,5 @@ Tracks backward and forward links between artifact instances so that the Busines
 [MIL-007]: ../milestones/mil-007-resilience.md
 [MIL-008]: ../milestones/mil-008-documentation.md
 [MIL-009]: ../milestones/mil-009-verification-fix.md
+[MIL-010]: ../milestones/mil-010-credentials-file.md
 [50e8331]: https://git.tirsystem.com/Tirsvad-Udemy-100-days-of-code/049-snack-and-lift/commit/50e8331bd21910a72ae56b74c9ff6a3677a709b3
