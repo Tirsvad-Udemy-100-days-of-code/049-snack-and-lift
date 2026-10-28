@@ -9,7 +9,7 @@
 ## Version History
 | Date | Status | Author | Reviewer | Change | Commit |
 | --- | --- | --- | --- | --- | --- |
-| 2026-10-28 | Accepted | Jens Tirsvad Nielsen | AI as stand-in for S02 | Review record, the workflows publish-wiki.yml and sync-milestones.yml of MIL-008 task 5 | pending |
+| 2026-10-28 | Accepted | Jens Tirsvad Nielsen | AI as stand-in for S02 | Review record, the workflows publish-wiki.yml and sync-milestones.yml of MIL-008 task 5 | [0301fd2] |
 
 ---
 
@@ -66,3 +66,4 @@ Go-with-conditions - the two workflows are the framework's templates, copied int
 
 [MIL-008]: ../../milestones/mil-008-documentation.md
 [QC-WF-001]: ../../../framework/qc/code/qc-workflow.md
+[0301fd2]: https://git.tirsystem.com/Tirsvad-Udemy-100-days-of-code/049-snack-and-lift/commit/0301fd2f0bc22a26ee8d71ec41dab2bce0d38dc3
