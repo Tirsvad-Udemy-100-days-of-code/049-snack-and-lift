@@ -9,7 +9,7 @@
 ## Version History
 | Date | Status | Author | Reviewer | Change | Commit |
 | --- | --- | --- | --- | --- | --- |
-| 2026-10-28 | Accepted | Jens Tirsvad Nielsen | AI as stand-in for S02 | Review record, full review of the source and tests of MIL-002 | pending |
+| 2026-10-28 | Accepted | Jens Tirsvad Nielsen | AI as stand-in for S02 | Review record, full review of the source and tests of MIL-002 | [7fdc11a] |
 
 ---
 
@@ -61,3 +61,4 @@ Gate evidence for MIL-002: `pip install -e .[dev]` and `pytest` pass (6 passed, 
 
 [MIL-002]: ../../milestones/mil-002-scaffold.md
 [QC-PY-001]: ../../../framework/qc/code/qc-programming-python.md
+[7fdc11a]: https://git.tirsystem.com/Tirsvad-Udemy-100-days-of-code/049-snack-and-lift/commit/7fdc11a0e7a8d2d1db63676c73c59b8fe999e0b4
