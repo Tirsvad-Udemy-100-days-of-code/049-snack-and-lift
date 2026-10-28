@@ -10,7 +10,8 @@
   </div>
   <script>
     // Imitates the site: a loading text, then the page for the state in the query
-    // (?state=empty or ?state=error; anything else shows two bookings and a waitlist entry).
+    // (?state=empty or ?state=error; anything else shows two bookings and a waitlist entry;
+    // ?extra=future adds three more Tuesday and Thursday 6pm bookings after the others).
     const params = new URLSearchParams(window.location.search);
     const state = params.get("state");
     // ?fail=N shows the error for the first N loads of the page in this tab (the network
@@ -20,6 +21,14 @@
     sessionStorage.setItem("loads", String(loads + 1));
     // The nav link keeps the state, so opening the page from here shows the same state again.
     document.getElementById("my-bookings-link").href = "my_bookings.html" + window.location.search;
+    function futureBookings() {
+      const whens = ["Thu, Aug 21, 6:00 PM", "Tue, Aug 26, 6:00 PM", "Thu, Aug 28, 6:00 PM"];
+      return whens.map(function (when, i) {
+        return '<div id="booking-card-' + (13 + i) + '" data-booking-status="confirmed">' +
+          '<h3 id="booking-class-name-' + (13 + i) + '">Spin Class</h3>' +
+          '<p><strong>When:</strong> ' + when + '</p></div>';
+      }).join("");
+    }
     const page = document.getElementById("my-bookings-page");
     const content = document.getElementById("content");
     setTimeout(function () {
@@ -30,7 +39,8 @@
       } else if (state === "empty") {
         content.innerHTML = '<div id="empty-bookings-state">You have no bookings yet</div>';
       } else {
-        page.dataset.bookingsCount = "2";
+        const extra = params.get("extra") === "future" ? futureBookings() : "";
+        page.dataset.bookingsCount = params.get("extra") === "future" ? "5" : "2";
         page.dataset.waitlistCount = "1";
         content.innerHTML =
           '<div id="confirmed-bookings-section">' +
@@ -40,6 +50,7 @@
           '<div id="booking-card-12" data-booking-status="confirmed">' +
           '<h3 id="booking-class-name-12">Yoga Class</h3>' +
           '<p><strong>When:</strong> Wed, Aug 13, 7:00 AM</p></div>' +
+          extra +
           '</div>' +
           '<div id="waitlist-section">' +
           '<div id="waitlist-card-21" data-booking-status="waitlisted">' +

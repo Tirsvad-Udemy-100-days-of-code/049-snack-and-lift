@@ -183,6 +183,21 @@ def test_main_logs_the_verification_and_returns_0_on_success(
 
 
 @pytest.mark.usefixtures("credentials_env")
+def test_main_notes_bookings_after_the_handled_classes_and_returns_0(
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    gym = FakeGym(
+        cards=[make_card("Tue, Aug 19")],
+        bookings=[make_entry("Tue, Aug 19, 6:00 PM"), make_entry("Tue, Aug 26, 6:00 PM")],
+    )
+
+    with caplog.at_level(logging.INFO):
+        assert main([], lambda *_: gym) == 0
+
+    assert "  i Also booked (not checked): Spin Class on Tue, Aug 26\n✅ SUCCESS" in caplog.text
+
+
+@pytest.mark.usefixtures("credentials_env")
 def test_main_returns_3_on_a_mismatch(tmp_path: Path, caplog: pytest.LogCaptureFixture) -> None:
     gym = FakeGym(cards=[make_card("Tue, Aug 19")], bookings=[make_entry("Wed, Aug 20, 7:00 AM")])
 

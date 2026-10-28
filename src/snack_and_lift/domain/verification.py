@@ -5,9 +5,11 @@
 from collections import Counter
 from collections.abc import Sequence
 from dataclasses import dataclass
+from datetime import date
 
 from snack_and_lift import constants
 from snack_and_lift.domain.booking_entry import BookingEntry
+from snack_and_lift.domain.errors import PageFormatError
 from snack_and_lift.domain.models import ClassResult, Outcome
 
 _WAITLISTED_OUTCOMES = (Outcome.NEW_WAITLIST, Outcome.ALREADY_WAITLISTED)
@@ -20,8 +22,11 @@ _Key = tuple[str, str, bool]
 class VerificationResult:
     """@brief What the My Bookings page shows compared with what the bot did.
 
-    `verified`, `missing` and `unexpected` hold display names, with the waitlist suffix for a
-    waitlist entry; `missing` and `unexpected` also say the day (`Spin Class on Tue, Aug 12`).
+    `verified`, `missing`, `unexpected` and `also_booked` hold display names, with the waitlist
+    suffix for a waitlist entry; all but `verified` also say the day (`Spin Class on Tue, Aug 12`).
+    Only entries from the earliest to the latest class the bot handled are checked: `found`
+    counts them, and `also_booked` lists the entries outside that window, which never cause
+    a mismatch.
     """
 
     expected: int
@@ -29,6 +34,7 @@ class VerificationResult:
     verified: list[str]
     missing: list[str]
     unexpected: list[str]
+    also_booked: list[str]
 
     @property
     def is_success(self) -> bool:
@@ -57,6 +63,46 @@ def _describe(key: _Key) -> str:
     return f"{_display_name(name, waitlisted)} on {day}"
 
 
+def _day_number(date_text: str) -> int:
+    """@brief The position of a date (`Tue, Aug 12`) in a year; the page shows no year.
+
+    @exception PageFormatError The text has no valid month and day.
+    """
+    month_text, _, day_text = date_text.partition(", ")[2].partition(" ")
+    try:
+        month = constants.MONTH_ABBREVIATIONS.index(month_text) + 1
+        day = date(constants.DATE_CYCLE_YEAR, month, int(day_text))
+    except ValueError as error:
+        raise PageFormatError(f"Unexpected date: {date_text!r}") from error
+    return day.timetuple().tm_yday
+
+
+def _offset(day: int, start: int) -> int:
+    """@brief The days from `start` to `day`, counting over the turn of the year."""
+    return (day - start) % constants.DAYS_IN_DATE_CYCLE
+
+
+def _window(keys: Sequence[_Key]) -> tuple[int, int] | None:
+    """@brief The first day and the length in days of the shortest span holding all the keys.
+
+    @return None when there is no key.
+    """
+    days = [_day_number(key[1]) for key in keys]
+    spans = [(max(_offset(day, start) for day in days), start) for start in days]
+    if not spans:
+        return None
+    span, start = min(spans)
+    return start, span
+
+
+def _is_in_window(key: _Key, window: tuple[int, int] | None) -> bool:
+    """@brief Tell whether the date of the key lies in the window, ends included."""
+    if window is None:
+        return False
+    start, span = window
+    return _offset(_day_number(key[1]), start) <= span
+
+
 def build_verification(
     results: Sequence[ClassResult], entries: Sequence[BookingEntry]
 ) -> VerificationResult:
@@ -64,11 +110,16 @@ def build_verification(
 
     @param results What happened to each class; waitlisted when the outcome is a waitlist one.
     @param entries The Tuesday and Thursday 6pm entries found on the page.
-    @return The comparison; the counts are the numbers of results and of entries.
+    @return The comparison; only the entries from the earliest to the latest class handled
+        are checked, the others are `also_booked`, and no class handled means no check.
     @exception PageFormatError An entry or a card has no valid date.
     """
     expected = _expected_keys(results)
-    remaining = Counter(_entry_keys(entries))
+    window = _window(expected)
+    keys = _entry_keys(entries)
+    checked = [key for key in keys if _is_in_window(key, window)]
+    also_booked = [_describe(key) for key in keys if not _is_in_window(key, window)]
+    remaining = Counter(checked)
     verified: list[str] = []
     missing: list[str] = []
     for key in expected:
@@ -78,7 +129,9 @@ def build_verification(
         else:
             missing.append(_describe(key))
     unexpected = [_describe(key) for key in remaining.elements()]
-    return VerificationResult(len(expected), len(entries), verified, missing, unexpected)
+    return VerificationResult(
+        len(expected), len(checked), verified, missing, unexpected, also_booked
+    )
 
 
 def _count_text(template: str, count: int) -> str:
@@ -99,10 +152,11 @@ def format_verification(result: VerificationResult) -> str:
     lines.append(constants.VERIFY_RESULT_TITLE)
     lines.append(_count_text(constants.VERIFY_EXPECTED, result.expected))
     lines.append(_count_text(constants.VERIFY_FOUND, result.found))
+    lines.extend(constants.VERIFY_LINE_ALSO_BOOKED.format(entry=t) for t in result.also_booked)
     if result.is_success:
         lines.append(constants.VERIFY_SUCCESS)
         return "\n".join(lines)
-    lines.append(constants.VERIFY_MISMATCH.format(count=result.expected - result.found))
+    lines.append(constants.VERIFY_MISMATCH.format(count=len(result.missing)))
     lines.extend(constants.VERIFY_LINE_MISSING.format(entry=text) for text in result.missing)
     lines.extend(constants.VERIFY_LINE_UNEXPECTED.format(entry=text) for text in result.unexpected)
     return "\n".join(lines)
