@@ -10,11 +10,13 @@ from collections.abc import Callable, Sequence
 from pathlib import Path
 
 from snack_and_lift import constants
-from snack_and_lift.application.booking import book_next_tuesday
+from snack_and_lift.application.booking import book_next_tuesday, book_target_classes
 from snack_and_lift.application.credentials import Credentials, load_credentials
 from snack_and_lift.application.ports import GymPort
 from snack_and_lift.application.session import login
 from snack_and_lift.domain.errors import GymError, LoginFailedError, MissingCredentialsError
+from snack_and_lift.domain.models import ClassResult
+from snack_and_lift.domain.report import format_detail_list, format_summary
 from snack_and_lift.infrastructure.browser import create_driver, default_profile_dir
 from snack_and_lift.infrastructure.console_recorder import ConsoleRecorder
 from snack_and_lift.infrastructure.selenium_gym import SeleniumGym
@@ -69,6 +71,11 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
         default=None,
         help="save a screenshot after each step into this folder",
     )
+    parser.add_argument(
+        "--first-tuesday-only",
+        action="store_true",
+        help="book only the next Tuesday 6pm class (lecture steps 3 and 4)",
+    )
     args = parser.parse_args(argv)
     if args.keep_open is None:
         args.keep_open = not args.headless
@@ -95,10 +102,26 @@ def _save_step(gym: GymPort, screenshot_dir: Path | None, name: str) -> None:
         gym.save_screenshot(screenshot_dir / name)
 
 
+def _save_console(gym: GymPort, screenshot_dir: Path | None, text: str, name: str) -> None:
+    """@brief Save console text as an image when a folder was asked for.
+
+    @param gym The gym site.
+    @param screenshot_dir The folder, or None for no screenshots.
+    @param text The console text to draw.
+    @param name The file name.
+    """
+    if screenshot_dir is not None:
+        gym.save_text_screenshot(text, screenshot_dir / name)
+
+
 def _run(
     gym: GymPort, args: argparse.Namespace, recorder: ConsoleRecorder, credentials: Credentials
 ) -> None:
-    """@brief Open the site, log in and book the next Tuesday class, saving the step images.
+    """@brief Open the site, log in and book the classes, saving the step images.
+
+    Books every Tuesday and Thursday 6pm class and logs the summary and the detailed list;
+    with `--first-tuesday-only` it books the next Tuesday class only.
+
 
     @param gym The gym site.
     @param args The parsed options.
@@ -110,10 +133,29 @@ def _run(
     _save_step(gym, args.screenshot_dir, "step-1.png")
     login(gym, credentials)
     _save_step(gym, args.screenshot_dir, "step-2.png")
-    book_next_tuesday(gym)
-    _save_step(gym, args.screenshot_dir, constants.SCREENSHOT_STEP_3)
-    if args.screenshot_dir is not None:
-        gym.save_text_screenshot(recorder.text, args.screenshot_dir / constants.SCREENSHOT_STEP_4)
+    if args.first_tuesday_only:
+        book_next_tuesday(gym)
+        _save_step(gym, args.screenshot_dir, constants.SCREENSHOT_STEP_3)
+        _save_console(gym, args.screenshot_dir, recorder.text, constants.SCREENSHOT_STEP_4)
+        return
+    window_saved = False
+
+    def save_window_once(_: ClassResult) -> None:
+        nonlocal window_saved
+        if not window_saved:
+            _save_step(gym, args.screenshot_dir, constants.SCREENSHOT_STEP_3)
+            window_saved = True
+
+    results = book_target_classes(gym, save_window_once)
+    if not window_saved:
+        _save_step(gym, args.screenshot_dir, constants.SCREENSHOT_STEP_3)
+    _save_console(gym, args.screenshot_dir, recorder.text, constants.SCREENSHOT_STEP_4)
+    summary = format_summary(results)
+    logger.info("%s", summary)
+    _save_console(gym, args.screenshot_dir, summary, constants.SCREENSHOT_STEP_5)
+    detail = format_detail_list(results)
+    logger.info("%s", detail)
+    _save_console(gym, args.screenshot_dir, f"{summary}\n{detail}", constants.SCREENSHOT_STEP_6)
 
 
 def main(

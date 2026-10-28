@@ -11,6 +11,7 @@ from snack_and_lift.domain.rules import (
     Action,
     decide_outcome_action,
     find_next_class,
+    find_target_classes,
     format_outcome,
     is_target_time,
     parse_day_label,
@@ -136,3 +137,28 @@ def test_action_for_busy_or_unknown_button_raises(button_text: str) -> None:
 )
 def test_outcome_message(outcome: Outcome, message: str) -> None:
     assert format_outcome(outcome, make_card()) == message
+
+
+def test_find_target_classes_returns_tuesdays_and_thursdays_in_page_order() -> None:
+    cards = [
+        make_card("Today (Wed, Aug 13)", card_id="1"),
+        make_card("Tomorrow (Thu, Aug 14)", card_id="2"),
+        make_card("Fri, Aug 15", card_id="3"),
+        make_card("Tue, Aug 19", card_id="4"),
+    ]
+
+    assert [card.card_id for card in find_target_classes(cards)] == ["2", "4"]
+
+
+def test_find_target_classes_ignores_other_times_and_completed_cards() -> None:
+    cards = [
+        make_card("Thu, Aug 14", time_text="Time: 7:00 AM", card_id="1"),
+        make_card("Thu, Aug 14", button_text="Completed", card_id="2"),
+        make_card("Tue, Aug 19", time_text="Time: 6:00 PM", card_id="3"),
+    ]
+
+    assert [card.card_id for card in find_target_classes(cards)] == ["3"]
+
+
+def test_find_target_classes_is_empty_when_none_match() -> None:
+    assert find_target_classes([make_card("Wed, Aug 13")]) == []

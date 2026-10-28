@@ -8,7 +8,9 @@ from pathlib import Path
 
 import pytest
 
+from snack_and_lift.application.booking import book_target_classes
 from snack_and_lift.domain.errors import GymError, LoginFailedError
+from snack_and_lift.domain.models import Outcome
 from snack_and_lift.infrastructure.browser import create_driver
 from snack_and_lift.infrastructure.selenium_gym import SeleniumGym
 
@@ -110,3 +112,17 @@ def test_save_text_screenshot_writes_a_png_and_keeps_the_page(
 
     assert target.read_bytes().startswith(b"\x89PNG")
     assert schedule_gym.list_class_cards()
+
+
+def test_book_target_classes_books_every_tuesday_and_thursday_class(
+    schedule_gym: SeleniumGym,
+) -> None:
+    with pytest.raises(GymError, match="Network error"):
+        book_target_classes(schedule_gym)
+
+    results = book_target_classes(schedule_gym)
+
+    assert [(r.card.card_id, r.outcome) for r in results] == [
+        ("201", Outcome.ALREADY_WAITLISTED),
+        ("302", Outcome.NEW_BOOKING),
+    ]
