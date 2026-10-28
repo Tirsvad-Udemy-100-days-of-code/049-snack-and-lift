@@ -228,3 +228,26 @@ VERIFY_SUCCESS: Final[str] = "✅ SUCCESS: All bookings verified!"
 VERIFY_MISMATCH: Final[str] = "❌ MISMATCH: Missing {count} bookings"
 VERIFY_LINE_MISSING: Final[str] = "  ✗ Missing: {entry}"
 VERIFY_LINE_UNEXPECTED: Final[str] = "  ? Unexpected: {entry}"
+VERIFY_LINE_ALSO_BOOKED: Final[str] = "  i Also booked (not checked): {entry}"
+
+## Month abbreviations of the dates on the pages, January first.
+MONTH_ABBREVIATIONS: Final[tuple[str, ...]] = (
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+)
+
+## Days of a year, with the 29th of February, used to compare dates that have no year.
+DAYS_IN_DATE_CYCLE: Final[int] = 366
+
+## A leap year, so that the 29th of February is a valid date.
+DATE_CYCLE_YEAR: Final[int] = 2000

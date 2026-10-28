@@ -175,6 +175,20 @@ def test_list_my_bookings_reads_confirmed_and_waitlist_entries(
     ]
 
 
+def test_get_my_bookings_returns_bookings_listed_after_the_others(
+    open_my_bookings_page: Callable[[str], SeleniumGym],
+) -> None:
+    entries = get_my_bookings(open_my_bookings_page("?extra=future"))
+
+    assert [entry.when_text for entry in entries][-4:] == [
+        "Thu, Aug 21, 6:00 PM",
+        "Tue, Aug 26, 6:00 PM",
+        "Thu, Aug 28, 6:00 PM",
+        "Thu, Aug 14, 6:00 PM",
+    ]
+    assert len(entries) == 6
+
+
 def test_list_my_bookings_returns_nothing_for_the_empty_state(
     open_my_bookings_page: Callable[[str], SeleniumGym],
 ) -> None:

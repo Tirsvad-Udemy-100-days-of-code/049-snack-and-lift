@@ -53,6 +53,16 @@ def test_verify_bookings_ignores_entries_that_are_not_target_classes() -> None:
     assert verify_bookings(gym, results).is_success
 
 
+def test_verify_bookings_lists_target_entries_after_the_window_as_also_booked() -> None:
+    gym = FakeGym(bookings=[make_entry(), make_entry("Thu, Aug 21, 6:00 PM")])
+    results = [ClassResult(make_card("Tue, Aug 12"), Outcome.NEW_BOOKING)]
+
+    verification = verify_bookings(gym, results)
+
+    assert verification.is_success
+    assert verification.also_booked == ["Spin Class on Thu, Aug 21"]
+
+
 def test_verify_bookings_reports_a_missing_booking() -> None:
     gym = FakeGym(bookings=[make_entry("Wed, Aug 13, 7:00 AM")])
     results = [ClassResult(make_card("Tue, Aug 12"), Outcome.NEW_BOOKING)]
