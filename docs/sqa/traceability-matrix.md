@@ -38,6 +38,7 @@ Tracks backward and forward links between artifact instances so that the Busines
 | [MIL-008] | Milestone | en | it | [BC-001], [PP-001] | - | RC-015 |
 | Source and tests of [MIL-002] | Python source code | - | - | [MIL-002], [ADR-0002], [ADR-0003] | - | RC-016 |
 | Source and tests of [MIL-003] | Python source code | - | - | [MIL-003], [ADR-0002], [ADR-0003] | - | RC-017 (Go-with-conditions) |
+| Source and tests of [MIL-004] | Python source code | - | - | [MIL-004], [ADR-0002] | - | RC-018 (Go-with-conditions) |
 
 ## Concern Coverage
 
