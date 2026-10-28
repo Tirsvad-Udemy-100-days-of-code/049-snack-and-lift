@@ -64,3 +64,65 @@ HEADLESS_BROWSER_ARGUMENTS: Final[tuple[str, ...]] = (
     "--disable-dev-shm-usage",
     "--disable-gpu",
 )
+
+## Weekday of the class that lecture steps 3 and 4 book, as the site abbreviates it.
+NEXT_CLASS_WEEKDAY: Final[str] = "Tue"
+
+## Hour (24-hour clock) of the class the bot books.
+TARGET_HOUR: Final[int] = 18
+
+## Minute of the class the bot books.
+TARGET_MINUTE: Final[int] = 0
+
+## CSS selector of every class card on the schedule.
+CLASS_CARD_CSS: Final[str] = "div[id^='class-card-']"
+
+## Prefix of the element ids of one card; the card id (for example "123") follows it.
+CLASS_CARD_ID_PREFIX: Final[str] = "class-card-"
+CLASS_NAME_ID_PREFIX: Final[str] = "class-name-"
+CLASS_TIME_ID_PREFIX: Final[str] = "class-time-"
+BOOK_BUTTON_ID_PREFIX: Final[str] = "book-button-"
+COMPLETED_LABEL_ID_PREFIX: Final[str] = "completed-label-"
+CLASS_ERROR_ID_PREFIX: Final[str] = "class-error-"
+
+## XPath, relative to a card, of the title of the day group the card is in (the "ancestor" hint).
+DAY_TITLE_XPATH: Final[str] = (
+    "ancestor::div[starts-with(@id,'day-group-')]//h2[starts-with(@id,'day-title-')]"
+)
+
+## Texts of the button of a card.
+BUTTON_TEXT_BOOK: Final[str] = "Book Class"
+BUTTON_TEXT_JOIN_WAITLIST: Final[str] = "Join Waitlist"
+BUTTON_TEXT_BOOKED: Final[str] = "Booked"
+BUTTON_TEXT_WAITLISTED: Final[str] = "Waitlisted"
+BUTTON_TEXT_BOOKING: Final[str] = "Booking..."
+BUTTON_TEXT_JOINING: Final[str] = "Joining..."
+BUTTON_TEXT_COMPLETED: Final[str] = "Completed"
+
+## Prefix of the time text of a card ("Time: 6:00 PM").
+TIME_TEXT_PREFIX: Final[str] = "Time:"
+
+## Day labels the site wraps around the date of the next two days.
+DAY_LABEL_WRAPPERS: Final[tuple[str, ...]] = ("Today", "Tomorrow")
+
+## Console messages of the booking, with the class name and the day label as the site shows it.
+MESSAGE_BOOKED: Final[str] = "✓ Successfully booked: {name} on {day}"
+MESSAGE_WAITLISTED: Final[str] = "✓ Joined waitlist for: {name} on {day}"
+MESSAGE_ALREADY_BOOKED: Final[str] = "✓ Already booked: {name} on {day}"
+MESSAGE_ALREADY_WAITLISTED: Final[str] = "✓ Already on waitlist: {name} on {day}"
+MESSAGE_NO_CLASS_FOUND: Final[str] = "No {weekday} class at {time} found on the schedule"
+
+## File names of the screenshots of lecture steps 3 and 4.
+SCREENSHOT_STEP_3: Final[str] = "step-3.png"
+SCREENSHOT_STEP_4: Final[str] = "step-4.png"
+
+## `string.Template` of the page that renders console text for a screenshot.
+CONSOLE_PAGE_TEMPLATE: Final[str] = (
+    "<!DOCTYPE html><html><head><meta charset='utf-8'></head>"
+    "<body style='margin:0;background:#1e1e1e;color:#d4d4d4'>"
+    "<pre style='margin:0;padding:16px;font:16px/1.5 monospace;white-space:pre-wrap'>"
+    "$text</pre></body></html>"
+)
+
+## Prefix of the `data:` URL that carries the console page.
+CONSOLE_PAGE_URL_PREFIX: Final[str] = "data:text/html;charset=utf-8,"

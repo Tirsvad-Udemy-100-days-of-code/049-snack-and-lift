@@ -13,3 +13,11 @@ class LoginFailedError(GymError):
 
 class MissingCredentialsError(Exception):
     """@brief The account e-mail or password is not set in the environment."""
+
+
+class UnknownButtonError(GymError):
+    """@brief A class button shows a text the bot cannot act on (busy, completed or unknown)."""
+
+
+class PageFormatError(GymError):
+    """@brief A text read from the page (a day label or a time) has an unexpected format."""

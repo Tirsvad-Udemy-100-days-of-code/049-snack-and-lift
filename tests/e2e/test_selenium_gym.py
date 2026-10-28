@@ -8,7 +8,7 @@ from pathlib import Path
 
 import pytest
 
-from snack_and_lift.domain.errors import LoginFailedError
+from snack_and_lift.domain.errors import GymError, LoginFailedError
 from snack_and_lift.infrastructure.browser import create_driver
 from snack_and_lift.infrastructure.selenium_gym import SeleniumGym
 
@@ -55,3 +55,58 @@ def test_save_screenshot_creates_the_folder(gym: SeleniumGym, tmp_path: Path) ->
     gym.save_screenshot(target)
 
     assert target.stat().st_size > 0
+
+
+FIXTURE_SCHEDULE = (Path(__file__).parent / "fixtures" / "schedule.html").as_uri()
+
+
+@pytest.fixture
+def schedule_gym(tmp_path: Path) -> Iterator[SeleniumGym]:
+    driver = create_driver(headless=True, profile_dir=tmp_path / "profile", keep_open=False)
+    try:
+        driver.get(FIXTURE_SCHEDULE)
+        yield SeleniumGym(driver, base_url=FIXTURE_SCHEDULE)
+    finally:
+        driver.quit()
+
+
+def test_list_class_cards_reads_the_day_from_the_ancestor_group(schedule_gym: SeleniumGym) -> None:
+    cards = {card.card_id: card for card in schedule_gym.list_class_cards()}
+
+    assert list(cards) == ["101", "102", "201", "401", "301", "302"]
+    assert cards["102"].day_label == "Today (Wed, Aug 13)"
+    assert cards["201"].weekday == "Thu"
+    assert cards["302"].weekday == "Tue"
+    assert cards["302"].name == "Spin Class"
+    assert cards["302"].time_text == "Time: 6:00 PM"
+    assert cards["302"].button_text == "Book Class"
+    assert cards["101"].button_text == "Completed"
+    assert cards["401"].button_text == "Booked"
+
+
+def test_press_class_button_confirms_booking(schedule_gym: SeleniumGym) -> None:
+    assert schedule_gym.press_class_button("102") == "Booked"
+
+
+def test_press_class_button_confirms_waitlist(schedule_gym: SeleniumGym) -> None:
+    assert schedule_gym.press_class_button("201") == "Waitlisted"
+
+
+def test_press_class_button_raises_with_the_error_text_then_succeeds(
+    schedule_gym: SeleniumGym,
+) -> None:
+    with pytest.raises(GymError, match="Network error"):
+        schedule_gym.press_class_button("302")
+
+    assert schedule_gym.press_class_button("302") == "Booked"
+
+
+def test_save_text_screenshot_writes_a_png_and_keeps_the_page(
+    schedule_gym: SeleniumGym, tmp_path: Path
+) -> None:
+    target = tmp_path / "shots" / "step-4.png"
+
+    schedule_gym.save_text_screenshot("✓ Successfully booked: <Spin Class>", target)
+
+    assert target.read_bytes().startswith(b"\x89PNG")
+    assert schedule_gym.list_class_cards()

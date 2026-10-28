@@ -2,6 +2,83 @@
 <html lang="en">
 <head><meta charset="utf-8"><title>Fixture gym schedule</title></head>
 <body>
-  <div id="schedule-page">Class schedule</div>
+  <div id="schedule-page">
+    <h1>Class Schedule (Today: Wed, Aug 13)</h1>
+    <select id="day-filter"><option>Next 7 Days</option></select>
+
+    <div id="day-group-wed-aug-13">
+      <h2 id="day-title-wed-aug-13">Today (Wed, Aug 13)</h2>
+      <div id="class-card-101" data-class-type="yoga" data-user-booked="false">
+        <h3 id="class-name-101">Yoga Class</h3>
+        <p id="class-time-101"><strong>Time:</strong> 6:00 AM</p>
+        <span id="completed-label-101">Completed</span>
+      </div>
+      <div id="class-card-102" data-class-type="spin" data-user-booked="false">
+        <h3 id="class-name-102">Spin Class</h3>
+        <p id="class-time-102"><strong>Time:</strong> 6:00 PM</p>
+        <button id="book-button-102">Book Class</button>
+      </div>
+    </div>
+
+    <div id="day-group-thu-aug-14">
+      <h2 id="day-title-thu-aug-14">Tomorrow (Thu, Aug 14)</h2>
+      <div id="class-card-201" data-class-type="hiit" data-user-booked="false">
+        <h3 id="class-name-201">HIIT Class</h3>
+        <p id="class-time-201"><strong>Time:</strong> 6:00 PM</p>
+        <button id="book-button-201">Join Waitlist</button>
+      </div>
+    </div>
+
+    <div id="day-group-fri-aug-15">
+      <h2 id="day-title-fri-aug-15">Fri, Aug 15</h2>
+      <div id="class-card-401" data-class-type="hiit" data-user-booked="true">
+        <h3 id="class-name-401">HIIT Class</h3>
+        <p id="class-time-401"><strong>Time:</strong> 5:00 PM</p>
+        <button id="book-button-401" disabled>Booked</button>
+      </div>
+    </div>
+
+    <div id="day-group-tue-aug-19">
+      <h2 id="day-title-tue-aug-19">Tue, Aug 19</h2>
+      <div id="class-card-301" data-class-type="yoga" data-user-booked="false">
+        <h3 id="class-name-301">Yoga Class</h3>
+        <p id="class-time-301"><strong>Time:</strong> 7:00 AM</p>
+        <button id="book-button-301">Book Class</button>
+      </div>
+      <div id="class-card-302" data-class-type="spin" data-user-booked="false" data-fail-once="true">
+        <h3 id="class-name-302">Spin Class</h3>
+        <p id="class-time-302"><strong>Time:</strong> 6:00 PM</p>
+        <button id="book-button-302">Book Class</button>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Imitates the site: a busy text, then the new state; card 302 fails on its first click.
+    document.querySelectorAll("button[id^='book-button-']").forEach(function (button) {
+      button.addEventListener("click", function () {
+        const id = button.id.replace("book-button-", "");
+        const card = document.getElementById("class-card-" + id);
+        const oldText = button.textContent;
+        const stale = document.getElementById("class-error-" + id);
+        if (stale) { stale.remove(); }
+        const waitlist = oldText === "Join Waitlist";
+        button.textContent = waitlist ? "Joining..." : "Booking...";
+        button.disabled = true;
+        setTimeout(function () {
+          if (card.dataset.failOnce === "true") {
+            card.dataset.failOnce = "false";
+            button.textContent = oldText;
+            button.disabled = false;
+            const box = document.createElement("div");
+            box.id = "class-error-" + id;
+            box.textContent = "Network error, please try again";
+            card.appendChild(box);
+            return;
+          }
+          button.textContent = waitlist ? "Waitlisted" : "Booked";
+        }, 200);
+      });
+    });
+  </script>
 </body>
 </html>
