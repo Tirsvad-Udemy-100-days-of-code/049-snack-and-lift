@@ -12,7 +12,7 @@
 | Date | Status | Author | Reviewer | Change | Commit |
 | --- | --- | --- | --- | --- | --- |
 | 2026-10-28 | Accepted | Jens Tirsvad Nielsen | S01 | Initial version: eight gateways | [50e8331] |
-| 2026-10-28 | Accepted | Jens Tirsvad Nielsen | S01 | Add MIL-009, a verification fix found in a real run (S01 accepted the plan in chat) | pending |
+| 2026-10-28 | Accepted | Jens Tirsvad Nielsen | S01 | Add MIL-009, a verification fix found in a real run (S01 accepted the plan in chat) | [3b9e381] |
 
 ---
 
@@ -113,3 +113,4 @@ A No-Go on a gateway stops all later gateways until it is fixed and re-reviewed.
 [MIL-008]: ./milestones/mil-008-documentation.md
 [MIL-009]: ./milestones/mil-009-verification-fix.md
 [50e8331]: https://git.tirsystem.com/Tirsvad-Udemy-100-days-of-code/049-snack-and-lift/commit/50e8331bd21910a72ae56b74c9ff6a3677a709b3
+[3b9e381]: https://git.tirsystem.com/Tirsvad-Udemy-100-days-of-code/049-snack-and-lift/commit/3b9e381cd42c56cc4543869c5b80c8e0014b4948

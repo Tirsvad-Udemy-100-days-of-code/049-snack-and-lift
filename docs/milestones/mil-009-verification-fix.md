@@ -11,7 +11,7 @@
 ## Version History
 | Date | Status | Author | Reviewer | Change | Commit |
 | --- | --- | --- | --- | --- | --- |
-| 2026-10-28 | Accepted | Jens Tirsvad Nielsen | AI as stand-in for S02 | Initial version, added after a real run (issue #50) | pending |
+| 2026-10-28 | Accepted | Jens Tirsvad Nielsen | AI as stand-in for S02 | Initial version, added after a real run (issue #50) | [3b9e381] |
 
 ---
 
@@ -71,3 +71,4 @@ A corrected comparison in `domain/verification.py` and its use in `application/v
 [MIL-006]: ./mil-006-verify-and-time-travel.md
 [PP-001]: ../project-plan.md
 [SA-001]: ../stakeholder-analysis.md
+[3b9e381]: https://git.tirsystem.com/Tirsvad-Udemy-100-days-of-code/049-snack-and-lift/commit/3b9e381cd42c56cc4543869c5b80c8e0014b4948
