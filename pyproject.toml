@@ -1,0 +1,52 @@
+[build-system]
+requires = ["setuptools>=75"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "snack-and-lift-bot"
+version = "0.1.0"
+description = "Selenium bot that books classes at the Snack and Lift practice gym (Udemy 100 Days of Code, day 49)."
+readme = "README.md"
+requires-python = ">=3.13"
+license = { file = "LICENSE" }
+dependencies = [
+    "selenium>=4.25",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.3",
+    "pytest-cov>=6.0",
+    "ruff>=0.8",
+]
+
+[project.scripts]
+snack-and-lift = "snack_and_lift.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra --strict-markers"
+pythonpath = ["src"]
+markers = [
+    "browser: needs a real browser (run in the Docker container)",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py313"
+src = ["src", "tests"]
+extend-exclude = ["framework", "chrome_profile"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "N", "UP", "B", "SIM", "ANN"]
+
+[tool.coverage.run]
+source = ["snack_and_lift"]
+omit = ["*/infrastructure/*", "*/cli.py", "*/__main__.py"]
+
+[tool.coverage.report]
+fail_under = 80
+show_missing = true
