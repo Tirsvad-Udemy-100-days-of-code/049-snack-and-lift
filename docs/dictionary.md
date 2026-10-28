@@ -11,7 +11,7 @@
 ## Version History
 | Date | Status | Author | Reviewer | Change | Commit |
 | --- | --- | --- | --- | --- | --- |
-| 2026-10-28 | Accepted | Jens Tirsvad Nielsen | AI as stand-in for S02 | Initial version: eight gym and course terms | pending |
+| 2026-10-28 | Accepted | Jens Tirsvad Nielsen | AI as stand-in for S02 | Initial version: eight gym and course terms | [50e8331] |
 
 ---
 
@@ -44,3 +44,4 @@ Maps each Product Owner (PO) term to its professional IT term. PO language: Engl
 
 [BC-001]: ./business-case.md
 [SA-001]: ./stakeholder-analysis.md
+[50e8331]: https://git.tirsystem.com/Tirsvad-Udemy-100-days-of-code/049-snack-and-lift/commit/50e8331bd21910a72ae56b74c9ff6a3677a709b3

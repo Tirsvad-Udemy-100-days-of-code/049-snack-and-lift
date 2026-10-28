@@ -11,7 +11,7 @@
 ## Version History
 | Date | Status | Author | Reviewer | Change | Commit |
 | --- | --- | --- | --- | --- | --- |
-| 2026-10-28 | Accepted | Jens Tirsvad Nielsen | AI as stand-in for S02 | Initial version: Snack and Lift booking bot (Udemy day 49) | pending |
+| 2026-10-28 | Accepted | Jens Tirsvad Nielsen | AI as stand-in for S02 | Initial version: Snack and Lift booking bot (Udemy day 49) | [50e8331] |
 
 ---
 
@@ -153,3 +153,4 @@ Proceed: the scope is small, the risks have mitigations, and the narrowest first
 ---
 
 [SA-001]: ./stakeholder-analysis.md
+[50e8331]: https://git.tirsystem.com/Tirsvad-Udemy-100-days-of-code/049-snack-and-lift/commit/50e8331bd21910a72ae56b74c9ff6a3677a709b3

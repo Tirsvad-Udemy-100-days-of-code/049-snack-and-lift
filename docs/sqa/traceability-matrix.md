@@ -9,7 +9,7 @@
 ## Version History
 | Date | Status | Author | Reviewer | Change | Commit |
 | --- | --- | --- | --- | --- | --- |
-| 2026-10-28 | Accepted | Jens Tirsvad Nielsen | AI as stand-in for S02 | Initial version: baseline artifacts | pending |
+| 2026-10-28 | Accepted | Jens Tirsvad Nielsen | AI as stand-in for S02 | Initial version: baseline artifacts | [50e8331] |
 
 ---
 
@@ -68,3 +68,4 @@ Tracks backward and forward links between artifact instances so that the Busines
 [MIL-006]: ../milestones/mil-006-verify-and-time-travel.md
 [MIL-007]: ../milestones/mil-007-resilience.md
 [MIL-008]: ../milestones/mil-008-documentation.md
+[50e8331]: https://git.tirsystem.com/Tirsvad-Udemy-100-days-of-code/049-snack-and-lift/commit/50e8331bd21910a72ae56b74c9ff6a3677a709b3
