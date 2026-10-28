@@ -18,6 +18,12 @@ DUMMY_EMAIL = "dummy@example.invalid"
 DUMMY_PASSWORD = "dummy-password"
 
 
+@pytest.fixture(autouse=True)
+def isolated_working_directory(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """Run from an empty folder so the default env file is never a real one."""
+    monkeypatch.chdir(tmp_path)
+
+
 @pytest.fixture
 def credentials_env(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv(constants.ACCOUNT_EMAIL_ENV, DUMMY_EMAIL)
@@ -324,3 +330,68 @@ def test_main_passes_options_to_the_factory(tmp_path: Path) -> None:
     main(["--headless", "--profile-dir", str(tmp_path)], factory)
 
     assert received == [(True, tmp_path, False)]
+
+
+def _write_env_file(path: Path, email: str, password: str) -> Path:
+    path.write_text(
+        f"{constants.ACCOUNT_EMAIL_ENV}={email}\n"
+        f"export {constants.ACCOUNT_PASSWORD_ENV}='{password}'\n",
+        encoding="utf-8",
+    )
+    return path
+
+
+def test_env_file_defaults_to_the_gym_file_name() -> None:
+    assert parse_args([]).env_file == Path(constants.ENV_FILE_NAME)
+
+
+def test_env_file_option_is_read(tmp_path: Path) -> None:
+    assert parse_args(["--env-file", str(tmp_path / "x.env")]).env_file == tmp_path / "x.env"
+
+
+def test_main_reads_the_account_from_the_env_file(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.delenv(constants.ACCOUNT_EMAIL_ENV, raising=False)
+    monkeypatch.delenv(constants.ACCOUNT_PASSWORD_ENV, raising=False)
+    env_file = _write_env_file(tmp_path / "accounts.env", "file@example.invalid", "file-pass")
+    gym = FakeGym()
+
+    code = main(["--env-file", str(env_file)], lambda *_: gym)
+
+    assert code == 0
+    assert gym.logins == [("file@example.invalid", "file-pass")]
+
+
+def test_main_lets_a_real_environment_variable_win_over_the_env_file(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setenv(constants.ACCOUNT_EMAIL_ENV, DUMMY_EMAIL)
+    monkeypatch.setenv(constants.ACCOUNT_PASSWORD_ENV, DUMMY_PASSWORD)
+    env_file = _write_env_file(tmp_path / "accounts.env", "file@example.invalid", "file-pass")
+    gym = FakeGym()
+
+    code = main(["--env-file", str(env_file)], lambda *_: gym)
+
+    assert code == 0
+    assert gym.logins == [(DUMMY_EMAIL, DUMMY_PASSWORD)]
+
+
+def test_main_exits_2_when_neither_environment_nor_file_has_the_account(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.delenv(constants.ACCOUNT_EMAIL_ENV, raising=False)
+    monkeypatch.delenv(constants.ACCOUNT_PASSWORD_ENV, raising=False)
+
+    assert main(["--env-file", str(tmp_path / "absent.env")], lambda *_: FakeGym()) == 2
+
+
+def test_main_exits_2_when_the_admin_account_is_half_set(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setenv(constants.ACCOUNT_EMAIL_ENV, DUMMY_EMAIL)
+    monkeypatch.setenv(constants.ACCOUNT_PASSWORD_ENV, DUMMY_PASSWORD)
+    monkeypatch.setenv(constants.ADMIN_EMAIL_ENV, "admin@example.invalid")
+    monkeypatch.delenv(constants.ADMIN_PASSWORD_ENV, raising=False)
+
+    assert main(["--env-file", str(tmp_path / "absent.env")], lambda *_: FakeGym()) == 2

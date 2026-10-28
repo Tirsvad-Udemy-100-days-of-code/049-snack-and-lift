@@ -39,6 +39,10 @@ $env:SNACK_AND_LIFT_EMAIL = "yourname@test.com"
 $env:SNACK_AND_LIFT_PASSWORD = "your password"
 ```
 
+## Kontofilen
+
+I stedet for at sætte variabler i hånden kan du skrive de samme linjer i en fil `.env.gym` i projektmappen (`SNACK_AND_LIFT_EMAIL=...` og `SNACK_AND_LIFT_PASSWORD=...`). Botten læser den ved start; `--env-file PATH` peger på en anden fil, og en rigtig miljøvariabel vinder over filen. Git ignorerer `.env.gym`: læg den aldrig i repositoriet. De valgfrie `SNACK_AND_LIFT_ADMIN_EMAIL` og `SNACK_AND_LIFT_ADMIN_PASSWORD` gemmer øvelsessidens admin-konto; botten indlæser dem, men bruger dem ikke endnu.
+
 ## Kør og test
 
 ```bash

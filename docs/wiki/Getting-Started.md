@@ -39,6 +39,10 @@ $env:SNACK_AND_LIFT_EMAIL = "yourname@test.com"
 $env:SNACK_AND_LIFT_PASSWORD = "your password"
 ```
 
+## The account file
+
+Instead of setting variables by hand, put the same lines in a file `.env.gym` in the project folder (`SNACK_AND_LIFT_EMAIL=...` and `SNACK_AND_LIFT_PASSWORD=...`). The bot reads it at start; `--env-file PATH` names another file, and a real environment variable wins over the file. Git ignores `.env.gym`: never commit it. The optional `SNACK_AND_LIFT_ADMIN_EMAIL` and `SNACK_AND_LIFT_ADMIN_PASSWORD` hold the practice site's admin account; the bot loads them but does not use them yet.
+
 ## Run and test
 
 ```bash

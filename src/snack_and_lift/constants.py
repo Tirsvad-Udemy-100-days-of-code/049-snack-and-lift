@@ -70,6 +70,19 @@ ACCOUNT_EMAIL_ENV: Final[str] = "SNACK_AND_LIFT_EMAIL"
 ## Name of the environment variable that holds the account password.
 ACCOUNT_PASSWORD_ENV: Final[str] = "SNACK_AND_LIFT_PASSWORD"
 
+## Names of the environment variables that hold the admin account (read, not used yet).
+ADMIN_EMAIL_ENV: Final[str] = "SNACK_AND_LIFT_ADMIN_EMAIL"
+ADMIN_PASSWORD_ENV: Final[str] = "SNACK_AND_LIFT_ADMIN_PASSWORD"
+
+## Error for an admin account with one variable only; {name} is the missing variable.
+MESSAGE_ADMIN_HALF_SET: Final[str] = (
+    "Set {name} too: the admin account needs both "
+    "SNACK_AND_LIFT_ADMIN_EMAIL and SNACK_AND_LIFT_ADMIN_PASSWORD"
+)
+
+## Default file with the gym accounts, relative to the current directory.
+ENV_FILE_NAME: Final[str] = ".env.gym"
+
 ## Folder where screenshots of a container run are written.
 SCREENSHOT_DIR: Final[str] = "docs/images"
 
