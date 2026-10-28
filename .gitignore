@@ -43,3 +43,4 @@ Thumbs.db
 
 # Selenium Chrome profile created by the bot (holds the practice site data)
 /chrome_profile/
+.env.gym

@@ -14,6 +14,4 @@ You learn explicit waits (`WebDriverWait`) and how to fill a form. `login()` typ
 
 ![Step 2: Automated login](https://git.tirsystem.com/Tirsvad-Udemy-100-days-of-code/049-snack-and-lift/raw/branch/main/docs/images/step-2.png)
 
-> This image is an illustration: the bot ran against the project's local test pages (`tests/e2e/fixtures`), not against the live gym site. A run with a real account and `--screenshot-dir` (see [Getting started](Getting-Started)) replaces it.
-
 [Previous: 1](Step-1) · [Home](Home) · [Next: 3](Step-3)

@@ -14,6 +14,6 @@ Du lærer at datoer er den almindelige fejlkilde: sidens admin-knap "advance 3 d
 
 ![Trin 8: Kvalitetssikring med tidsrejse](https://git.tirsystem.com/Tirsvad-Udemy-100-days-of-code/049-snack-and-lift/raw/branch/main/docs/images/step-8.png)
 
-> Dette billede er en illustration: botten kørte mod projektets lokale testsider (`tests/e2e/fixtures`), ikke mod det rigtige gym-site. En kørsel med en rigtig konto og `--screenshot-dir` (se [Kom i gang](Getting-Started-da)) erstatter det.
+> Dette er en rigtig kørsel. Siden My Bookings viser også bookinger fra tidligere kørsler uden for tidsplanens næste 7 dage, så kontrollen melder dem som uventede og ender med MISMATCH. Det er en kendt fejl i kontrollen, som skal rettes.
 
 [Forrige: 7](Step-7-da) · [Forside](Home-da) · [Næste: 9](Step-9-da)

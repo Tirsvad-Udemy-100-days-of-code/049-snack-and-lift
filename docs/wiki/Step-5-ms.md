@@ -14,6 +14,4 @@ Anda belajar menyimpan pembilang semasa gelung berjalan dan mencetak laporan: BO
 
 ![Langkah 5: Pembilang dan ringkasan](https://git.tirsystem.com/Tirsvad-Udemy-100-days-of-code/049-snack-and-lift/raw/branch/main/docs/images/step-5.png)
 
-> Imej ini ialah ilustrasi: bot dijalankan terhadap halaman ujian tempatan projek (`tests/e2e/fixtures`), bukan laman gim sebenar. Larian dengan akaun sebenar dan `--screenshot-dir` (lihat [Mula menggunakan](Getting-Started-ms)) menggantikannya.
-
 [Sebelumnya: 4](Step-4-ms) · [Utama](Home-ms) · [Seterusnya: 6](Step-6-ms)

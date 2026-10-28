@@ -115,7 +115,7 @@ docker run --rm snack-and-lift
 
 ## 📸 Lecture steps and screenshots
 
-Each step has a wiki page that explains what it teaches, in [English](https://git.tirsystem.com/Tirsvad-Udemy-100-days-of-code/049-snack-and-lift/wiki/Home), [Dansk](https://git.tirsystem.com/Tirsvad-Udemy-100-days-of-code/049-snack-and-lift/wiki/Home-da) and [Bahasa Melayu](https://git.tirsystem.com/Tirsvad-Udemy-100-days-of-code/049-snack-and-lift/wiki/Home-ms). Step 1 is a screenshot of the live site. Steps 2 to 9 are illustrations drawn from the project's local test pages (`tests/e2e/fixtures`), because the live site needs an account; a run with your own account and `--screenshot-dir` (see [Getting started](https://git.tirsystem.com/Tirsvad-Udemy-100-days-of-code/049-snack-and-lift/wiki/Getting-Started)) replaces them.
+Each step has a wiki page that explains what it teaches, in [English](https://git.tirsystem.com/Tirsvad-Udemy-100-days-of-code/049-snack-and-lift/wiki/Home), [Dansk](https://git.tirsystem.com/Tirsvad-Udemy-100-days-of-code/049-snack-and-lift/wiki/Home-da) and [Bahasa Melayu](https://git.tirsystem.com/Tirsvad-Udemy-100-days-of-code/049-snack-and-lift/wiki/Home-ms). All nine images are screenshots of a real run against the live site. Step 8 ends in MISMATCH: the My Bookings page also lists bookings from earlier runs outside the schedule's next 7 days, which the check does not yet ignore.
 
 | Step | Wiki page | Screenshot |
 | --- | --- | --- |

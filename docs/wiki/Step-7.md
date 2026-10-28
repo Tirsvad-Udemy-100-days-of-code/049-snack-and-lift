@@ -14,6 +14,4 @@ You learn to check your own work from a second source: `get_my_bookings()` reads
 
 ![Step 7: Verify on the My Bookings page](https://git.tirsystem.com/Tirsvad-Udemy-100-days-of-code/049-snack-and-lift/raw/branch/main/docs/images/step-7.png)
 
-> This image is an illustration: the bot ran against the project's local test pages (`tests/e2e/fixtures`), not against the live gym site. A run with a real account and `--screenshot-dir` (see [Getting started](Getting-Started)) replaces it.
-
 [Previous: 6](Step-6) · [Home](Home) · [Next: 8](Step-8)
