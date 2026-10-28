@@ -4,7 +4,7 @@
 | Key | Value |
 | --- | --- |
 | ID | PP-001 |
-| CrossReference | [BC-001], [SA-001], [MIL-001], [MIL-002], [MIL-003], [MIL-004], [MIL-005], [MIL-006], [MIL-007], [MIL-008] |
+| CrossReference | [BC-001], [SA-001], [MIL-001], [MIL-002], [MIL-003], [MIL-004], [MIL-005], [MIL-006], [MIL-007], [MIL-008], [MIL-009] |
 | Language | en |
 | Domain | it |
 
@@ -12,12 +12,13 @@
 | Date | Status | Author | Reviewer | Change | Commit |
 | --- | --- | --- | --- | --- | --- |
 | 2026-10-28 | Accepted | Jens Tirsvad Nielsen | S01 | Initial version: eight gateways | [50e8331] |
+| 2026-10-28 | Accepted | Jens Tirsvad Nielsen | S01 | Add MIL-009, a verification fix found in a real run (S01 accepted the plan in chat) | pending |
 
 ---
 
 ## Purpose
 
-This plan schedules eight gateways (`MIL-001` to `MIL-008`) that take the Snack and Lift booking bot from an accepted baseline to a documented, tested and published repository. The Business Case sets no deadline, so the window 2026-10-28 to 2026-11-06 is a planning assumption of this plan. Each gateway ends in a decision and a deliverable and is delivered by one pull request on its own branch.
+This plan schedules nine gateways (`MIL-001` to `MIL-009`) that take the Snack and Lift booking bot from an accepted baseline to a documented, tested and published repository. The Business Case sets no deadline, so the window 2026-10-28 to 2026-11-06 is a planning assumption of this plan. Each gateway ends in a decision and a deliverable and is delivered by one pull request on its own branch.
 
 ## Planning Assumptions
 
@@ -39,6 +40,7 @@ This plan schedules eight gateways (`MIL-001` to `MIL-008`) that take the Snack 
 | Lecture steps 7 and 8 | [MIL-006] | 2026-11-01 to 2026-11-02 | 2026-11-02 | S01 | none (technical tasks) | My Bookings verification, time travel, screenshots 7 and 8 | |
 | Lecture step 9 | [MIL-007] | 2026-11-02 to 2026-11-04 | 2026-11-04 | S01 | none (technical tasks) | `retry`, resilient `login`, `book_class`, `get_my_bookings`, screenshot 9 | |
 | Documentation, wiki and release | [MIL-008] | 2026-11-04 to 2026-11-06 | 2026-11-06 | S01 | none (documentation) | README, Doxygen, wiki in en, da and ms, final checks | |
+| Verification fix | [MIL-009] | 2026-11-04 to 2026-11-06 | 2026-11-06 | S01 | none (technical tasks) | Verification compares only the window of the run; new screenshots 7 to 9 | |
 
 ```plantuml
 @startgantt
@@ -77,7 +79,7 @@ Project starts 2026-10-28
 ## Dependencies
 
 ```
-MIL-001 → MIL-002 → MIL-003 → MIL-004 → MIL-005 → MIL-006 → MIL-007 → MIL-008
+MIL-001 → MIL-002 → MIL-003 → MIL-004 → MIL-005 → MIL-006 → MIL-007 → MIL-008 → MIL-009
 ```
 
 A No-Go on a gateway stops all later gateways until it is fixed and re-reviewed. The end date then moves by the days spent on the rework; S01 decides a move of the end date.
@@ -109,4 +111,5 @@ A No-Go on a gateway stops all later gateways until it is fixed and re-reviewed.
 [MIL-006]: ./milestones/mil-006-verify-and-time-travel.md
 [MIL-007]: ./milestones/mil-007-resilience.md
 [MIL-008]: ./milestones/mil-008-documentation.md
+[MIL-009]: ./milestones/mil-009-verification-fix.md
 [50e8331]: https://git.tirsystem.com/Tirsvad-Udemy-100-days-of-code/049-snack-and-lift/commit/50e8331bd21910a72ae56b74c9ff6a3677a709b3
