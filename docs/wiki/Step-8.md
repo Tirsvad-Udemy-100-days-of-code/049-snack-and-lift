@@ -14,6 +14,6 @@ You learn that dates are the usual bug: the site's admin control "advance 3 days
 
 ![Step 8: Time travel quality assurance](https://git.tirsystem.com/Tirsvad-Udemy-100-days-of-code/049-snack-and-lift/raw/branch/main/docs/images/step-8.png)
 
-> This is a real run. The My Bookings page also lists bookings from earlier runs that lie outside the schedule's next 7 days, so the check reports them as unexpected and ends with MISMATCH. This is a known defect of the check, tracked for a fix.
+> This image was taken before a fix: the My Bookings page also lists bookings from earlier runs outside the schedule's next 7 days, and the check then ended in MISMATCH. The check now compares only the days of the run and prints the other bookings as "Also booked (not checked)", so the same run ends in SUCCESS.
 
 [Previous: 7](Step-7) · [Home](Home) · [Next: 9](Step-9)

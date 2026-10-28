@@ -14,6 +14,6 @@ Anda belajar bahawa tarikh ialah punca pepijat biasa: kawalan admin laman "advan
 
 ![Langkah 8: Jaminan kualiti dengan perjalanan masa](https://git.tirsystem.com/Tirsvad-Udemy-100-days-of-code/049-snack-and-lift/raw/branch/main/docs/images/step-8.png)
 
-> Ini ialah larian sebenar. Halaman My Bookings turut menyenaraikan tempahan daripada larian terdahulu di luar 7 hari jadual seterusnya, jadi semakan melaporkannya sebagai tidak dijangka dan berakhir dengan MISMATCH. Ini kecacatan yang diketahui pada semakan dan akan dibaiki.
+> Imej ini diambil sebelum pembaikan: halaman My Bookings turut menyenaraikan tempahan daripada larian terdahulu di luar 7 hari jadual seterusnya, dan semakan berakhir dengan MISMATCH. Semakan kini hanya membandingkan hari larian dan mencetak tempahan lain sebagai "Also booked (not checked)", jadi larian yang sama berakhir dengan SUCCESS.
 
 [Sebelumnya: 7](Step-7-ms) · [Utama](Home-ms) · [Seterusnya: 9](Step-9-ms)
