@@ -12,7 +12,7 @@
 | Date | Status | Author | Reviewer | Change | Commit |
 | --- | --- | --- | --- | --- | --- |
 | 2026-10-28 | Accepted | Jens Tirsvad Nielsen | S01 | Add MIL-009, a verification fix found in a real run (S01 accepted the plan in chat) | [3b9e381] |
-| 2026-10-28 | Accepted | Jens Tirsvad Nielsen | S01 | Add MIL-010, gym accounts from a credentials file (S01 asked for it in chat) | pending |
+| 2026-10-28 | Accepted | Jens Tirsvad Nielsen | S01 | Add MIL-010, gym accounts from a credentials file (S01 asked for it in chat) | [434bdaf] |
 
 ---
 
@@ -116,3 +116,4 @@ A No-Go on a gateway stops all later gateways until it is fixed and re-reviewed.
 [MIL-010]: ./milestones/mil-010-credentials-file.md
 [50e8331]: https://git.tirsystem.com/Tirsvad-Udemy-100-days-of-code/049-snack-and-lift/commit/50e8331bd21910a72ae56b74c9ff6a3677a709b3
 [3b9e381]: https://git.tirsystem.com/Tirsvad-Udemy-100-days-of-code/049-snack-and-lift/commit/3b9e381cd42c56cc4543869c5b80c8e0014b4948
+[434bdaf]: https://git.tirsystem.com/Tirsvad-Udemy-100-days-of-code/049-snack-and-lift/commit/434bdafefdf0a95eed175dc89f27fbd91b19c91f

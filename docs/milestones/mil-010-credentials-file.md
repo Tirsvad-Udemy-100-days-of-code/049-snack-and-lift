@@ -11,7 +11,7 @@
 ## Version History
 | Date | Status | Author | Reviewer | Change | Commit |
 | --- | --- | --- | --- | --- | --- |
-| 2026-10-28 | Accepted | Jens Tirsvad Nielsen | AI as stand-in for S02 | Initial version, requested by S01 in chat | pending |
+| 2026-10-28 | Accepted | Jens Tirsvad Nielsen | AI as stand-in for S02 | Initial version, requested by S01 in chat | [434bdaf] |
 
 ---
 
@@ -71,3 +71,4 @@ Decide whether the bot can read the student and the admin account of the practic
 [MIL-003]: ./mil-003-login.md
 [PP-001]: ../project-plan.md
 [SA-001]: ../stakeholder-analysis.md
+[434bdaf]: https://git.tirsystem.com/Tirsvad-Udemy-100-days-of-code/049-snack-and-lift/commit/434bdafefdf0a95eed175dc89f27fbd91b19c91f

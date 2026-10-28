@@ -9,7 +9,7 @@
 ## Version History
 | Date | Status | Author | Reviewer | Change | Commit |
 | --- | --- | --- | --- | --- | --- |
-| 2026-10-28 | Accepted | Jens Tirsvad Nielsen | AI as stand-in for S02 | Review record, full review of the source and tests of MIL-010 | pending |
+| 2026-10-28 | Accepted | Jens Tirsvad Nielsen | AI as stand-in for S02 | Review record, full review of the source and tests of MIL-010 | [42f05bd] |
 
 ---
 
@@ -59,3 +59,4 @@ Go — the code of MIL-010 meets every Mandatory criterion of QC-PY-001. No bloc
 
 [MIL-010]: ../../milestones/mil-010-credentials-file.md
 [QC-PY-001]: ../../../framework/qc/code/qc-programming-python.md
+[42f05bd]: https://git.tirsystem.com/Tirsvad-Udemy-100-days-of-code/049-snack-and-lift/commit/42f05bdd0f5c300fbd162e8cf50075fc98964e1b
