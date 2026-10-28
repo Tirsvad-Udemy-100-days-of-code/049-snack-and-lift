@@ -12,7 +12,11 @@ from pathlib import Path
 
 from snack_and_lift import constants
 from snack_and_lift.application.booking import book_next_tuesday, book_target_classes
-from snack_and_lift.application.credentials import Credentials, load_credentials
+from snack_and_lift.application.credentials import (
+    Credentials,
+    load_admin_credentials,
+    load_credentials,
+)
 from snack_and_lift.application.ports import GymPort
 from snack_and_lift.application.retry import Sleep
 from snack_and_lift.application.session import login_with_retry
@@ -23,6 +27,7 @@ from snack_and_lift.domain.report import format_detail_list, format_summary
 from snack_and_lift.domain.verification import format_verification
 from snack_and_lift.infrastructure.browser import create_driver, default_profile_dir
 from snack_and_lift.infrastructure.console_recorder import ConsoleRecorder
+from snack_and_lift.infrastructure.env_file import read_env_file
 from snack_and_lift.infrastructure.selenium_gym import SeleniumGym
 
 ## Builds the gym site from (headless, profile folder, keep open).
@@ -69,7 +74,8 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
         description="Books the Tuesday and Thursday 6pm classes at the Snack and Lift gym.",
         epilog=(
             "exit codes: 0 done, 1 a step failed (also when every retry failed), "
-            "2 credentials missing, 3 the My Bookings page does not match the bookings made"
+            "2 credentials missing in the environment or the env file, "
+            "3 the My Bookings page does not match the bookings made"
         ),
     )
     parser.add_argument(
@@ -108,6 +114,16 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
         help=(
             "attempts for the login, each booking and the My Bookings page when the site "
             f"drops a request (default: {constants.RETRY_COUNT}, at least 1)"
+        ),
+    )
+    parser.add_argument(
+        "--env-file",
+        type=Path,
+        default=Path(constants.ENV_FILE_NAME),
+        metavar="PATH",
+        help=(
+            "file with the gym accounts as KEY=VALUE lines "
+            f"(default: ./{constants.ENV_FILE_NAME}); a real environment variable wins"
         ),
     )
     args = parser.parse_args(argv)
@@ -242,7 +258,9 @@ def _main(
     _use_utf8_output()
     args = parse_args(argv)
     try:
-        credentials = load_credentials(os.environ)
+        environment = {**read_env_file(args.env_file), **os.environ}
+        credentials = load_credentials(environment)
+        load_admin_credentials(environment)  # load-only for now; nothing uses it yet
     except MissingCredentialsError as error:
         logger.error("%s", error)
         return 2

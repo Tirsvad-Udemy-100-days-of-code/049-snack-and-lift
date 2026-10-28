@@ -39,6 +39,10 @@ $env:SNACK_AND_LIFT_EMAIL = "yourname@test.com"
 $env:SNACK_AND_LIFT_PASSWORD = "your password"
 ```
 
+## Fail akaun
+
+Daripada menetapkan pemboleh ubah secara manual, letakkan baris yang sama dalam fail `.env.gym` di folder projek (`SNACK_AND_LIFT_EMAIL=...` dan `SNACK_AND_LIFT_PASSWORD=...`). Bot membacanya semasa bermula; `--env-file PATH` menamakan fail lain, dan pemboleh ubah persekitaran sebenar mengatasi fail. Git mengabaikan `.env.gym`: jangan sekali-kali commit. `SNACK_AND_LIFT_ADMIN_EMAIL` dan `SNACK_AND_LIFT_ADMIN_PASSWORD` yang pilihan menyimpan akaun admin laman latihan; bot memuatkannya tetapi belum menggunakannya.
+
 ## Jalankan dan uji
 
 ```bash
