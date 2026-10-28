@@ -9,7 +9,7 @@
 ## Version History
 | Date | Status | Author | Reviewer | Change | Commit |
 | --- | --- | --- | --- | --- | --- |
-| 2026-10-29 | Accepted | Jens Tirsvad Nielsen | AI as stand-in for S02 | Review record, the workflow sync-milestones.yml after the framework update to 0.18.0 and the removal of publish-wiki.yml | pending |
+| 2026-10-29 | Accepted | Jens Tirsvad Nielsen | AI as stand-in for S02 | Review record, the workflow sync-milestones.yml after the framework update to 0.18.0 and the removal of publish-wiki.yml | [2cfcd02] |
 
 ---
 
@@ -66,3 +66,4 @@ Go-with-conditions - the milestone workflow is the framework template (0.18.0) p
 
 [MIL-008]: ../../milestones/mil-008-documentation.md
 [QC-WF-001]: ../../../framework/qc/code/qc-workflow.md
+[2cfcd02]: https://git.tirsystem.com/Tirsvad-Udemy-100-days-of-code/049-snack-and-lift/commit/2cfcd0258897aeb90cea48baf59a8af258df19dd
