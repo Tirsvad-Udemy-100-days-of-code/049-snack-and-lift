@@ -9,7 +9,7 @@
 ## Version History
 | Date | Status | Author | Reviewer | Change | Commit |
 | --- | --- | --- | --- | --- | --- |
-| 2026-10-28 | Accepted | Jens Tirsvad Nielsen | AI as stand-in for S02 | Review record, full review of the source and tests of MIL-007 | pending |
+| 2026-10-28 | Accepted | Jens Tirsvad Nielsen | AI as stand-in for S02 | Review record, full review of the source and tests of MIL-007 | [5d28e68] |
 
 ---
 
@@ -59,3 +59,4 @@ Go-with-conditions - the code of MIL-007 meets every Mandatory criterion of QC-P
 
 [MIL-007]: ../../milestones/mil-007-resilience.md
 [QC-PY-001]: ../../../framework/qc/code/qc-programming-python.md
+[5d28e68]: https://git.tirsystem.com/Tirsvad-Udemy-100-days-of-code/049-snack-and-lift/commit/5d28e682b41e1a03b0cac1a6b2ea4977750d45b8
