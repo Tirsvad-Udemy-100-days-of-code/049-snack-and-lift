@@ -41,6 +41,7 @@ Tracks backward and forward links between artifact instances so that the Busines
 | Source and tests of [MIL-004] | Python source code | - | - | [MIL-004], [ADR-0002] | - | RC-018 (Go-with-conditions) |
 | Source and tests of [MIL-005] | Python source code | - | - | [MIL-005], [ADR-0002] | - | RC-019 (Go-with-conditions) |
 | Source and tests of [MIL-006] | Python source code | - | - | [MIL-006], [ADR-0002] | - | RC-020 (Go-with-conditions) |
+| Source and tests of [MIL-007] | Python source code | - | - | [MIL-007], [ADR-0002] | - | RC-021 (Go-with-conditions) |
 
 ## Concern Coverage
 

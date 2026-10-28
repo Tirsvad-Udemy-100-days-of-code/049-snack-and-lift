@@ -18,6 +18,31 @@ WAIT_TIMEOUT_SECONDS: Final[int] = 10
 ## Attempts of the `retry` wrapper before it gives up (lecture step 9).
 RETRY_COUNT: Final[int] = 7
 
+## Seconds to wait between two attempts of the `retry` wrapper.
+RETRY_DELAY_SECONDS: Final[float] = 0.5
+
+## Name of a retried step that was given no description.
+RETRY_DEFAULT_DESCRIPTION: Final[str] = "operation"
+
+## Descriptions of the retried steps, as they appear in the log.
+RETRY_DESCRIPTION_LOGIN: Final[str] = "login"
+RETRY_DESCRIPTION_BOOK: Final[str] = "book {name} on {day}"
+RETRY_DESCRIPTION_BOOKINGS: Final[str] = "get my bookings"
+
+## Messages of the `retry` wrapper.
+MESSAGE_RETRY_FAILED: Final[str] = (
+    "⚠ Attempt {attempt}/{retries} failed: {description}: {error}. Retrying..."
+)
+MESSAGE_RETRY_SUCCEEDED: Final[str] = "✓ {description} succeeded after {attempts} attempts"
+MESSAGE_RETRIES_EXHAUSTED: Final[str] = "{description} failed after {retries} attempts: {error}"
+MESSAGE_RETRIES_INVALID: Final[str] = "retries must be at least 1, got {retries}"
+
+## Error raised when a class card is no longer on the schedule while a booking is repeated.
+MESSAGE_CLASS_NOT_ON_SCHEDULE: Final[str] = "class {card_id} not found on the schedule"
+
+## File name of the screenshot of lecture step 9 (the console with the retry warnings).
+SCREENSHOT_STEP_9: Final[str] = "step-9.png"
+
 ## Weekdays of the classes the bot books, as the site abbreviates them.
 TARGET_WEEKDAYS: Final[tuple[str, ...]] = ("Tue", "Thu")
 

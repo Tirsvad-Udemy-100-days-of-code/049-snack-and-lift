@@ -88,11 +88,18 @@ class SeleniumGym:
         @exception LoginFailedError The site shows a login error.
         @exception GymError The page did not behave as expected.
         """
-        self._wait.until(ec.element_to_be_clickable((By.ID, constants.NAV_LOGIN_BUTTON_ID))).click()
-        self._wait.until(
+        # After a failed login the form is still shown, so a repeated login skips the nav button.
+        if not self._driver.find_elements(By.ID, constants.LOGIN_EMAIL_INPUT_ID):
+            self._wait.until(
+                ec.element_to_be_clickable((By.ID, constants.NAV_LOGIN_BUTTON_ID))
+            ).click()
+        email_input = self._wait.until(
             ec.presence_of_element_located((By.ID, constants.LOGIN_EMAIL_INPUT_ID))
-        ).send_keys(email)
-        self._driver.find_element(By.ID, constants.LOGIN_PASSWORD_INPUT_ID).send_keys(password)
+        )
+        password_input = self._driver.find_element(By.ID, constants.LOGIN_PASSWORD_INPUT_ID)
+        for field, value in ((email_input, email), (password_input, password)):
+            field.clear()
+            field.send_keys(value)
         self._driver.find_element(By.ID, constants.LOGIN_SUBMIT_BUTTON_ID).click()
         self._wait.until(
             ec.any_of(
