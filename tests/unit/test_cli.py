@@ -6,6 +6,7 @@ from pathlib import Path
 
 import pytest
 from tests.unit.fakes import FakeGym
+from tests.unit.test_models import make_card
 
 from snack_and_lift import constants
 from snack_and_lift.cli import main, parse_args
@@ -61,8 +62,41 @@ def test_main_saves_both_screenshots_on_success(tmp_path: Path) -> None:
 
     assert code == 0
     assert gym.logins == [(DUMMY_EMAIL, DUMMY_PASSWORD)]
-    assert gym.screenshots == [tmp_path / "step-1.png", tmp_path / "step-2.png"]
-    assert gym.calls == ["open_site", "save_screenshot", "log_in", "save_screenshot"]
+    assert gym.screenshots == [
+        tmp_path / "step-1.png",
+        tmp_path / "step-2.png",
+        tmp_path / "step-3.png",
+    ]
+    assert [path for _, path in gym.text_screenshots] == [tmp_path / "step-4.png"]
+    assert gym.calls == [
+        "open_site",
+        "save_screenshot",
+        "log_in",
+        "save_screenshot",
+        "list_class_cards",
+        "save_screenshot",
+        "save_text_screenshot",
+    ]
+
+
+@pytest.mark.usefixtures("credentials_env")
+def test_main_books_the_class_and_draws_the_console_text(tmp_path: Path) -> None:
+    gym = FakeGym(cards=[make_card("Tue, Aug 19")])
+
+    assert main(["--screenshot-dir", str(tmp_path)], lambda *_: gym) == 0
+
+    assert gym.pressed == ["123"]
+    text, _ = gym.text_screenshots[0]
+    assert "✓ Logged in" in text
+    assert "✓ Successfully booked: Spin Class on Tue, Aug 19" in text
+
+
+@pytest.mark.usefixtures("credentials_env")
+def test_main_returns_1_when_the_booking_fails() -> None:
+    gym = FakeGym(cards=[make_card("Tue, Aug 19")], press_error="Network down")
+
+    assert main(["--headless"], lambda *_: gym) == 1
+    assert gym.closed is True
 
 
 @pytest.mark.usefixtures("credentials_env")

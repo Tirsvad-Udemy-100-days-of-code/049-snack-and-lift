@@ -5,6 +5,8 @@
 from pathlib import Path
 from typing import Protocol
 
+from snack_and_lift.domain.models import ClassCard
+
 
 class GymPort(Protocol):
     """@brief The gym site as the use cases see it."""
@@ -23,6 +25,32 @@ class GymPort(Protocol):
         @param password The account password.
         @exception LoginFailedError The site refused the login.
         @exception GymError The page did not behave as expected.
+        """
+        ...
+
+    def list_class_cards(self) -> list[ClassCard]:
+        """@brief Read every class card of the schedule, in page order.
+
+        @return The classes, each with the day of its group.
+        @exception GymError The schedule could not be read.
+        """
+        ...
+
+    def press_class_button(self, card_id: str) -> str:
+        """@brief Click the button of a class and wait until the request has finished.
+
+        @param card_id The id of the card without its prefix.
+        @return The new text of the button.
+        @exception GymError The site shows an error for the class (the message is its text)
+            or nothing settled in time.
+        """
+        ...
+
+    def save_text_screenshot(self, text: str, path: Path) -> None:
+        """@brief Save an image of console text.
+
+        @param text The lines to draw, in a dark monospace style.
+        @param path The PNG file to write; its folders are created.
         """
         ...
 

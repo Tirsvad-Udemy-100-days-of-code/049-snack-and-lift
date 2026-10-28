@@ -9,11 +9,14 @@ import sys
 from collections.abc import Callable, Sequence
 from pathlib import Path
 
-from snack_and_lift.application.credentials import load_credentials
+from snack_and_lift import constants
+from snack_and_lift.application.booking import book_next_tuesday
+from snack_and_lift.application.credentials import Credentials, load_credentials
 from snack_and_lift.application.ports import GymPort
 from snack_and_lift.application.session import login
-from snack_and_lift.domain.errors import LoginFailedError, MissingCredentialsError
+from snack_and_lift.domain.errors import GymError, LoginFailedError, MissingCredentialsError
 from snack_and_lift.infrastructure.browser import create_driver, default_profile_dir
+from snack_and_lift.infrastructure.console_recorder import ConsoleRecorder
 from snack_and_lift.infrastructure.selenium_gym import SeleniumGym
 
 ## Builds the gym site from (headless, profile folder, keep open).
@@ -92,17 +95,56 @@ def _save_step(gym: GymPort, screenshot_dir: Path | None, name: str) -> None:
         gym.save_screenshot(screenshot_dir / name)
 
 
+def _run(
+    gym: GymPort, args: argparse.Namespace, recorder: ConsoleRecorder, credentials: Credentials
+) -> None:
+    """@brief Open the site, log in and book the next Tuesday class, saving the step images.
+
+    @param gym The gym site.
+    @param args The parsed options.
+    @param recorder The recorded console lines, drawn for step 4.
+    @param credentials The account to log in with.
+    @exception GymError A step failed.
+    """
+    gym.open_site()
+    _save_step(gym, args.screenshot_dir, "step-1.png")
+    login(gym, credentials)
+    _save_step(gym, args.screenshot_dir, "step-2.png")
+    book_next_tuesday(gym)
+    _save_step(gym, args.screenshot_dir, constants.SCREENSHOT_STEP_3)
+    if args.screenshot_dir is not None:
+        gym.save_text_screenshot(recorder.text, args.screenshot_dir / constants.SCREENSHOT_STEP_4)
+
+
 def main(
     argv: Sequence[str] | None = None,
     gym_factory: GymFactory = selenium_gym_factory,
 ) -> int:
-    """@brief Start the bot: open the site and log in.
+    """@brief Start the bot: open the site, log in and book the next Tuesday 6pm class.
 
     @param argv Arguments without the program name; None reads `sys.argv`.
     @param gym_factory Builds the gym site; tests pass a fake.
-    @return Process exit code: 0 done, 1 login failed, 2 credentials missing.
+    @return Process exit code: 0 done, 1 a step failed, 2 credentials missing.
     """
     logging.basicConfig(level=logging.INFO, format="%(message)s")
+    root = logging.getLogger()
+    root.setLevel(logging.INFO)
+    recorder = ConsoleRecorder()
+    root.addHandler(recorder)
+    try:
+        return _main(argv, gym_factory, recorder)
+    finally:
+        root.removeHandler(recorder)
+
+
+def _main(argv: Sequence[str] | None, gym_factory: GymFactory, recorder: ConsoleRecorder) -> int:
+    """@brief The body of `main`, run while the recorder is attached.
+
+    @param argv Arguments without the program name.
+    @param gym_factory Builds the gym site.
+    @param recorder The console recorder.
+    @return Process exit code.
+    """
     _use_utf8_output()
     args = parse_args(argv)
     try:
@@ -112,12 +154,12 @@ def main(
         return 2
     gym = gym_factory(args.headless, args.profile_dir, args.keep_open)
     try:
-        gym.open_site()
-        _save_step(gym, args.screenshot_dir, "step-1.png")
-        login(gym, credentials)
-        _save_step(gym, args.screenshot_dir, "step-2.png")
+        _run(gym, args, recorder, credentials)
     except LoginFailedError as error:
         logger.error("Login failed: %s", error)
+        return 1
+    except GymError as error:
+        logger.error("Failed: %s", error)
         return 1
     finally:
         if not args.keep_open:
