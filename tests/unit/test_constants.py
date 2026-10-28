@@ -29,3 +29,7 @@ def test_retry_count_is_seven() -> None:
 
 def test_bot_books_tuesday_and_thursday() -> None:
     assert constants.TARGET_WEEKDAYS == ("Tue", "Thu")
+
+
+def test_retry_delay_is_half_a_second() -> None:
+    assert constants.RETRY_DELAY_SECONDS == 0.5

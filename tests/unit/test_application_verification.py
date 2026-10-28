@@ -3,13 +3,13 @@
 """
 
 import pytest
-from tests.unit.fakes import FakeGym
+from tests.unit.fakes import FakeGym, no_sleep
 from tests.unit.test_booking_entry import make_entry
 from tests.unit.test_models import make_card
 
 from snack_and_lift.application.booking import book_target_classes
 from snack_and_lift.application.verification import get_my_bookings, verify_bookings
-from snack_and_lift.domain.errors import GymError, NoBookingsFoundError
+from snack_and_lift.domain.errors import GymError, NoBookingsFoundError, RetriesExhaustedError
 from snack_and_lift.domain.models import ClassResult, Outcome
 
 
@@ -67,8 +67,10 @@ def test_verify_bookings_raises_when_classes_were_booked_but_the_page_is_empty()
     gym = FakeGym(bookings=[])
     results = [ClassResult(make_card("Tue, Aug 12"), Outcome.NEW_BOOKING)]
 
-    with pytest.raises(NoBookingsFoundError):
-        verify_bookings(gym, results)
+    with pytest.raises(RetriesExhaustedError) as caught:
+        verify_bookings(gym, results, sleep=no_sleep)
+
+    assert isinstance(caught.value.__cause__, NoBookingsFoundError)
 
 
 def test_verify_bookings_skips_the_page_when_nothing_is_expected() -> None:

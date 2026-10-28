@@ -5,7 +5,7 @@
 import logging
 
 import pytest
-from tests.unit.fakes import FakeGym
+from tests.unit.fakes import FakeGym, no_sleep
 from tests.unit.test_models import make_card
 
 from snack_and_lift.application.booking import (
@@ -147,4 +147,4 @@ def test_book_target_classes_propagates_a_failing_class() -> None:
     gym = FakeGym(cards=[make_card("Thu, Aug 14")], press_error="Network down")
 
     with pytest.raises(GymError, match="Network down"):
-        book_target_classes(gym)
+        book_target_classes(gym, sleep=no_sleep)

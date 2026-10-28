@@ -8,10 +8,17 @@ from pathlib import Path
 
 import pytest
 
-from snack_and_lift.application.booking import book_target_classes
-from snack_and_lift.application.verification import get_my_bookings
+from snack_and_lift.application.booking import book_class_with_retry, book_target_classes
+from snack_and_lift.application.credentials import Credentials
+from snack_and_lift.application.session import login_with_retry
+from snack_and_lift.application.verification import get_my_bookings, get_my_bookings_with_retry
 from snack_and_lift.domain.booking_entry import BookingEntry
-from snack_and_lift.domain.errors import GymError, LoginFailedError, NoBookingsFoundError
+from snack_and_lift.domain.errors import (
+    GymError,
+    LoginFailedError,
+    NoBookingsFoundError,
+    RetriesExhaustedError,
+)
 from snack_and_lift.domain.models import Outcome
 from snack_and_lift.infrastructure.browser import create_driver
 from snack_and_lift.infrastructure.selenium_gym import SeleniumGym
@@ -119,13 +126,11 @@ def test_save_text_screenshot_writes_a_png_and_keeps_the_page(
 def test_book_target_classes_books_every_tuesday_and_thursday_class(
     schedule_gym: SeleniumGym,
 ) -> None:
-    with pytest.raises(GymError, match="Network error"):
-        book_target_classes(schedule_gym)
-
-    results = book_target_classes(schedule_gym)
+    # Card 302 drops its first click; the booking repeats it and the page confirms the second.
+    results = book_target_classes(schedule_gym, sleep=lambda _: None)
 
     assert [(r.card.card_id, r.outcome) for r in results] == [
-        ("201", Outcome.ALREADY_WAITLISTED),
+        ("201", Outcome.NEW_WAITLIST),
         ("302", Outcome.NEW_BOOKING),
     ]
 
@@ -188,3 +193,80 @@ def test_list_my_bookings_raises_with_the_text_of_the_error_box(
 ) -> None:
     with pytest.raises(GymError, match="Failed to load bookings"):
         open_my_bookings_page("?state=error").list_my_bookings()
+
+
+FIXTURE_LOGIN = (Path(__file__).parent / "fixtures" / "login.html").as_uri()
+
+
+@pytest.fixture
+def open_fixture(tmp_path: Path) -> Iterator[Callable[[str], SeleniumGym]]:
+    """@brief Opens a fixture page by its address, with the query that sets its failures."""
+    driver = create_driver(headless=True, profile_dir=tmp_path / "profile", keep_open=False)
+
+    def open_page(url: str) -> SeleniumGym:
+        driver.get(url)
+        return SeleniumGym(driver, base_url=url)
+
+    try:
+        yield open_page
+    finally:
+        driver.quit()
+
+
+def test_login_with_retry_logs_in_after_two_dropped_requests(
+    open_fixture: Callable[[str], SeleniumGym],
+) -> None:
+    gym = open_fixture(FIXTURE_LOGIN + "?fail=2")
+    sleeps: list[float] = []
+
+    login_with_retry(gym, Credentials(FIXTURE_EMAIL, FIXTURE_PASSWORD), sleep=sleeps.append)
+
+    assert len(sleeps) == 2
+
+
+def test_login_with_retry_gives_up_when_every_request_is_dropped(
+    open_fixture: Callable[[str], SeleniumGym],
+) -> None:
+    gym = open_fixture(FIXTURE_LOGIN + "?fail=5")
+
+    with pytest.raises(RetriesExhaustedError, match="Network request failed"):
+        login_with_retry(
+            gym, Credentials(FIXTURE_EMAIL, FIXTURE_PASSWORD), retries=3, sleep=lambda _: None
+        )
+
+
+def test_book_class_with_retry_books_after_two_dropped_clicks(
+    open_fixture: Callable[[str], SeleniumGym],
+) -> None:
+    gym = open_fixture(FIXTURE_SCHEDULE + "?fail=2")
+    card = next(card for card in gym.list_class_cards() if card.card_id == "302")
+
+    result = book_class_with_retry(gym, card, sleep=lambda _: None)
+
+    assert result.outcome is Outcome.NEW_BOOKING
+    assert next(c for c in gym.list_class_cards() if c.card_id == "302").button_text == "Booked"
+
+
+def test_book_target_classes_completes_when_every_class_drops_two_clicks(
+    open_fixture: Callable[[str], SeleniumGym],
+) -> None:
+    gym = open_fixture(FIXTURE_SCHEDULE + "?fail=2")
+
+    results = book_target_classes(gym, sleep=lambda _: None)
+
+    assert [(r.card.card_id, r.outcome) for r in results] == [
+        ("201", Outcome.NEW_WAITLIST),
+        ("302", Outcome.NEW_BOOKING),
+    ]
+
+
+def test_get_my_bookings_with_retry_reads_the_page_after_two_failed_loads(
+    open_fixture: Callable[[str], SeleniumGym],
+) -> None:
+    gym = open_fixture(FIXTURE_MY_BOOKINGS + "?fail=2")
+    sleeps: list[float] = []
+
+    entries = get_my_bookings_with_retry(gym, sleep=sleeps.append)
+
+    assert [entry.name for entry in entries] == ["Spin Class", "Yoga Class", "HIIT Class"]
+    assert sleeps

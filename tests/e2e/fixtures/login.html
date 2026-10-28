@@ -12,8 +12,19 @@
     // Dummy account of this fixture only; it is not a real account.
     const ACCEPTED_EMAIL = "fixture@example.invalid";
     const ACCEPTED_PASSWORD = "fixture-password";
+    // Imitates the network simulation: ?fail=N drops the first N submits after a short delay.
+    let failuresLeft = parseInt(new URLSearchParams(window.location.search).get("fail") || "0", 10);
     document.getElementById("login-form").addEventListener("submit", function (event) {
       event.preventDefault();
+      document.getElementById("message-area").innerHTML = "";
+      if (failuresLeft > 0) {
+        failuresLeft -= 1;
+        setTimeout(function () {
+          document.getElementById("message-area").innerHTML =
+            '<div id="error-message">Network request failed. Please try again.</div>';
+        }, 100);
+        return;
+      }
       const email = document.getElementById("email-input").value;
       const password = document.getElementById("password-input").value;
       if (email === ACCEPTED_EMAIL && password === ACCEPTED_PASSWORD) {

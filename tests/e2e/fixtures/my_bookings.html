@@ -11,7 +11,13 @@
   <script>
     // Imitates the site: a loading text, then the page for the state in the query
     // (?state=empty or ?state=error; anything else shows two bookings and a waitlist entry).
-    const state = new URLSearchParams(window.location.search).get("state");
+    const params = new URLSearchParams(window.location.search);
+    const state = params.get("state");
+    // ?fail=N shows the error for the first N loads of the page in this tab (the network
+    // simulation); the count lives in sessionStorage because every load starts a new page.
+    const loads = parseInt(sessionStorage.getItem("loads") || "0", 10);
+    const dropped = loads < parseInt(params.get("fail") || "0", 10);
+    sessionStorage.setItem("loads", String(loads + 1));
     // The nav link keeps the state, so opening the page from here shows the same state again.
     document.getElementById("my-bookings-link").href = "my_bookings.html" + window.location.search;
     const page = document.getElementById("my-bookings-page");
@@ -19,7 +25,7 @@
     setTimeout(function () {
       document.getElementById("loading-placeholder").remove();
       page.dataset.loading = "false";
-      if (state === "error") {
+      if (state === "error" || dropped) {
         content.innerHTML = '<div id="error-message">Failed to load bookings</div>';
       } else if (state === "empty") {
         content.innerHTML = '<div id="empty-bookings-state">You have no bookings yet</div>';

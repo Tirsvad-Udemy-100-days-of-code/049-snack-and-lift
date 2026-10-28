@@ -6,6 +6,7 @@ import argparse
 import logging
 import os
 import sys
+import time
 from collections.abc import Callable, Sequence
 from pathlib import Path
 
@@ -13,7 +14,8 @@ from snack_and_lift import constants
 from snack_and_lift.application.booking import book_next_tuesday, book_target_classes
 from snack_and_lift.application.credentials import Credentials, load_credentials
 from snack_and_lift.application.ports import GymPort
-from snack_and_lift.application.session import login
+from snack_and_lift.application.retry import Sleep
+from snack_and_lift.application.session import login_with_retry
 from snack_and_lift.application.verification import verify_bookings
 from snack_and_lift.domain.errors import GymError, LoginFailedError, MissingCredentialsError
 from snack_and_lift.domain.models import ClassResult
@@ -40,6 +42,22 @@ def selenium_gym_factory(headless: bool, profile_dir: Path, keep_open: bool) -> 
     return SeleniumGym(create_driver(headless, profile_dir, keep_open))
 
 
+def _at_least_one(text: str) -> int:
+    """@brief Read a whole number of at least 1 for an option.
+
+    @param text The text of the option.
+    @return The number.
+    @exception argparse.ArgumentTypeError The text is not a whole number of at least 1.
+    """
+    try:
+        number = int(text)
+    except ValueError:
+        number = 0
+    if number < 1:
+        raise argparse.ArgumentTypeError(f"{text!r} is not a whole number of at least 1")
+    return number
+
+
 def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
     """@brief Read the command line.
 
@@ -50,8 +68,8 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
         prog="snack-and-lift",
         description="Books the Tuesday and Thursday 6pm classes at the Snack and Lift gym.",
         epilog=(
-            "exit codes: 0 done, 1 a step failed, 2 credentials missing, "
-            "3 the My Bookings page does not match the bookings made"
+            "exit codes: 0 done, 1 a step failed (also when every retry failed), "
+            "2 credentials missing, 3 the My Bookings page does not match the bookings made"
         ),
     )
     parser.add_argument(
@@ -81,6 +99,16 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
         "--first-tuesday-only",
         action="store_true",
         help="book only the next Tuesday 6pm class (lecture steps 3 and 4); skips the verification",
+    )
+    parser.add_argument(
+        "--retries",
+        type=_at_least_one,
+        default=constants.RETRY_COUNT,
+        metavar="N",
+        help=(
+            "attempts for the login, each booking and the My Bookings page when the site "
+            f"drops a request (default: {constants.RETRY_COUNT}, at least 1)"
+        ),
     )
     args = parser.parse_args(argv)
     if args.keep_open is None:
@@ -121,7 +149,11 @@ def _save_console(gym: GymPort, screenshot_dir: Path | None, text: str, name: st
 
 
 def _run(
-    gym: GymPort, args: argparse.Namespace, recorder: ConsoleRecorder, credentials: Credentials
+    gym: GymPort,
+    args: argparse.Namespace,
+    recorder: ConsoleRecorder,
+    credentials: Credentials,
+    sleep: Sleep,
 ) -> bool:
     """@brief Open the site, log in, book the classes and verify them, saving the step images.
 
@@ -133,15 +165,16 @@ def _run(
     @param args The parsed options.
     @param recorder The recorded console lines, drawn for step 4.
     @param credentials The account to log in with.
+    @param sleep Waits between two attempts of a retried step.
     @return False when the My Bookings page does not match the bookings made, else True.
-    @exception GymError A step failed.
+    @exception GymError A step failed on every attempt.
     """
     gym.open_site()
     _save_step(gym, args.screenshot_dir, "step-1.png")
-    login(gym, credentials)
+    login_with_retry(gym, credentials, args.retries, sleep)
     _save_step(gym, args.screenshot_dir, "step-2.png")
     if args.first_tuesday_only:
-        book_next_tuesday(gym)
+        book_next_tuesday(gym, args.retries, sleep)
         _save_step(gym, args.screenshot_dir, constants.SCREENSHOT_STEP_3)
         _save_console(gym, args.screenshot_dir, recorder.text, constants.SCREENSHOT_STEP_4)
         return True
@@ -153,7 +186,7 @@ def _run(
             _save_step(gym, args.screenshot_dir, constants.SCREENSHOT_STEP_3)
             window_saved = True
 
-    results = book_target_classes(gym, save_window_once)
+    results = book_target_classes(gym, save_window_once, args.retries, sleep)
     if not window_saved:
         _save_step(gym, args.screenshot_dir, constants.SCREENSHOT_STEP_3)
     _save_console(gym, args.screenshot_dir, recorder.text, constants.SCREENSHOT_STEP_4)
@@ -163,22 +196,25 @@ def _run(
     detail = format_detail_list(results)
     logger.info("%s", detail)
     _save_console(gym, args.screenshot_dir, f"{summary}\n{detail}", constants.SCREENSHOT_STEP_6)
-    verification = verify_bookings(gym, results)
+    verification = verify_bookings(gym, results, args.retries, sleep)
     _save_step(gym, args.screenshot_dir, constants.SCREENSHOT_STEP_7)
     verification_text = format_verification(verification)
     logger.info("%s", verification_text)
     _save_console(gym, args.screenshot_dir, verification_text, constants.SCREENSHOT_STEP_8)
+    _save_console(gym, args.screenshot_dir, recorder.text, constants.SCREENSHOT_STEP_9)
     return verification.is_success
 
 
 def main(
     argv: Sequence[str] | None = None,
     gym_factory: GymFactory = selenium_gym_factory,
+    sleep: Sleep = time.sleep,
 ) -> int:
-    """@brief Start the bot: open the site, log in and book the next Tuesday 6pm class.
+    """@brief Start the bot: open the site, log in, book the classes and verify them.
 
     @param argv Arguments without the program name; None reads `sys.argv`.
     @param gym_factory Builds the gym site; tests pass a fake.
+    @param sleep Waits between two attempts of a retried step; tests pass a recorder.
     @return Process exit code: 0 done, 1 a step failed, 2 credentials missing, 3 mismatch.
     """
     logging.basicConfig(level=logging.INFO, format="%(message)s")
@@ -187,17 +223,20 @@ def main(
     recorder = ConsoleRecorder()
     root.addHandler(recorder)
     try:
-        return _main(argv, gym_factory, recorder)
+        return _main(argv, gym_factory, recorder, sleep)
     finally:
         root.removeHandler(recorder)
 
 
-def _main(argv: Sequence[str] | None, gym_factory: GymFactory, recorder: ConsoleRecorder) -> int:
+def _main(
+    argv: Sequence[str] | None, gym_factory: GymFactory, recorder: ConsoleRecorder, sleep: Sleep
+) -> int:
     """@brief The body of `main`, run while the recorder is attached.
 
     @param argv Arguments without the program name.
     @param gym_factory Builds the gym site.
     @param recorder The console recorder.
+    @param sleep Waits between two attempts of a retried step.
     @return Process exit code.
     """
     _use_utf8_output()
@@ -209,7 +248,7 @@ def _main(argv: Sequence[str] | None, gym_factory: GymFactory, recorder: Console
         return 2
     gym = gym_factory(args.headless, args.profile_dir, args.keep_open)
     try:
-        verified = _run(gym, args, recorder, credentials)
+        verified = _run(gym, args, recorder, credentials, sleep)
     except LoginFailedError as error:
         logger.error("Login failed: %s", error)
         return 1

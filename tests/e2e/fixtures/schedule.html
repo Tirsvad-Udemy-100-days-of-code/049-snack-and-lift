@@ -46,7 +46,7 @@
         <p id="class-time-301"><strong>Time:</strong> 7:00 AM</p>
         <button id="book-button-301">Book Class</button>
       </div>
-      <div id="class-card-302" data-class-type="spin" data-user-booked="false" data-fail-once="true">
+      <div id="class-card-302" data-class-type="spin" data-user-booked="false" data-fail-times="1">
         <h3 id="class-name-302">Spin Class</h3>
         <p id="class-time-302"><strong>Time:</strong> 6:00 PM</p>
         <button id="book-button-302">Book Class</button>
@@ -55,6 +55,11 @@
   </div>
   <script>
     // Imitates the site: a busy text, then the new state; card 302 fails on its first click.
+    // ?fail=N makes every button fail on its first N clicks (the network simulation).
+    const failParam = parseInt(new URLSearchParams(window.location.search).get("fail") || "0", 10);
+    document.querySelectorAll("div[id^='class-card-']").forEach(function (card) {
+      card.dataset.failLeft = String(Math.max(failParam, parseInt(card.dataset.failTimes || "0", 10)));
+    });
     document.querySelectorAll("button[id^='book-button-']").forEach(function (button) {
       button.addEventListener("click", function () {
         const id = button.id.replace("book-button-", "");
@@ -66,8 +71,8 @@
         button.textContent = waitlist ? "Joining..." : "Booking...";
         button.disabled = true;
         setTimeout(function () {
-          if (card.dataset.failOnce === "true") {
-            card.dataset.failOnce = "false";
+          if (parseInt(card.dataset.failLeft, 10) > 0) {
+            card.dataset.failLeft = String(parseInt(card.dataset.failLeft, 10) - 1);
             button.textContent = oldText;
             button.disabled = false;
             const box = document.createElement("div");

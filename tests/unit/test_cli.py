@@ -6,7 +6,7 @@ import logging
 from pathlib import Path
 
 import pytest
-from tests.unit.fakes import FakeGym
+from tests.unit.fakes import FakeGym, no_sleep
 from tests.unit.test_booking_entry import make_entry
 from tests.unit.test_models import make_card
 
@@ -75,6 +75,7 @@ def test_main_saves_both_screenshots_on_success(tmp_path: Path) -> None:
         tmp_path / "step-5.png",
         tmp_path / "step-6.png",
         tmp_path / "step-8.png",
+        tmp_path / "step-9.png",
     ]
     assert gym.calls == [
         "open_site",
@@ -87,6 +88,7 @@ def test_main_saves_both_screenshots_on_success(tmp_path: Path) -> None:
         "save_text_screenshot",
         "save_text_screenshot",
         "save_screenshot",
+        "save_text_screenshot",
         "save_text_screenshot",
     ]
 
@@ -149,12 +151,18 @@ def test_main_saves_step_3_after_the_first_class_and_the_report_images(tmp_path:
         "list_my_bookings",
         "save_screenshot",
         "save_text_screenshot",
+        "save_text_screenshot",
     ]
     assert gym.screenshots[-2:] == [tmp_path / "step-3.png", tmp_path / "step-7.png"]
-    (_, _), (step_5, _), (step_6, _), (step_8, step_8_path) = gym.text_screenshots
+    (_, _), (step_5, _), (step_6, _), (step_8, step_8_path), (step_9, step_9_path) = (
+        gym.text_screenshots
+    )
     assert step_8_path == tmp_path / "step-8.png"
     assert step_8.startswith("--- VERIFYING ON MY BOOKINGS PAGE ---")
     assert step_8.endswith("✅ SUCCESS: All bookings verified!")
+    assert step_9_path == tmp_path / "step-9.png"
+    assert step_9.startswith("✓ Logged in")
+    assert step_9.endswith("✅ SUCCESS: All bookings verified!")
     assert step_5.startswith("--- BOOKING SUMMARY ---\nNew bookings: 2")
     assert "--- DETAILED CLASS LIST ---" not in step_5
     assert step_6.startswith(step_5)
@@ -185,7 +193,8 @@ def test_main_returns_3_on_a_mismatch(tmp_path: Path, caplog: pytest.LogCaptureF
     assert "❌ MISMATCH: Missing 1 bookings" in caplog.text
     assert "  ✗ Missing: Spin Class on Tue, Aug 19" in caplog.text
     assert gym.screenshots[-1] == tmp_path / "step-7.png"
-    assert gym.text_screenshots[-1][1] == tmp_path / "step-8.png"
+    assert gym.text_screenshots[-2][1] == tmp_path / "step-8.png"
+    assert gym.text_screenshots[-1][1] == tmp_path / "step-9.png"
     assert gym.closed is True
 
 
@@ -193,7 +202,7 @@ def test_main_returns_3_on_a_mismatch(tmp_path: Path, caplog: pytest.LogCaptureF
 def test_main_returns_1_when_the_bookings_page_is_empty() -> None:
     gym = FakeGym(cards=[make_card("Tue, Aug 19")], bookings=[])
 
-    assert main([], lambda *_: gym) == 1
+    assert main([], lambda *_: gym, no_sleep) == 1
 
 
 @pytest.mark.usefixtures("credentials_env")
@@ -239,7 +248,7 @@ def test_first_tuesday_only_flag_is_read() -> None:
 def test_main_returns_1_when_the_booking_fails() -> None:
     gym = FakeGym(cards=[make_card("Tue, Aug 19")], press_error="Network down")
 
-    assert main(["--headless"], lambda *_: gym) == 1
+    assert main(["--headless"], lambda *_: gym, no_sleep) == 1
     assert gym.closed is True
 
 
@@ -269,7 +278,7 @@ def test_main_returns_2_when_credentials_are_missing(
 def test_main_returns_1_when_login_fails() -> None:
     gym = FakeGym(login_error="Invalid credentials")
 
-    assert main(["--headless"], lambda *_: gym) == 1
+    assert main(["--headless"], lambda *_: gym, no_sleep) == 1
     assert gym.closed is True
 
 

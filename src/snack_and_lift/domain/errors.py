@@ -23,6 +23,10 @@ class PageFormatError(GymError):
     """@brief A text read from the page (a day label or a time) has an unexpected format."""
 
 
+class RetriesExhaustedError(GymError):
+    """@brief A step failed on every attempt; the cause is the error of the last attempt."""
+
+
 class NoBookingsFoundError(GymError):
     """@brief The My Bookings page shows no booking where the bot expects some.
 
