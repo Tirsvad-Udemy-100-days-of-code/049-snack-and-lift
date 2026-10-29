@@ -9,7 +9,7 @@
 ## Version History
 | Date | Status | Author | Reviewer | Change | Commit |
 | --- | --- | --- | --- | --- | --- |
-| 2026-10-29 | Accepted | Jens Tirsvad Nielsen | AI as stand-in for S02 | Review record, the wiki in docs/wiki after the sidebar change of framework 0.19.0 | pending |
+| 2026-10-29 | Accepted | Jens Tirsvad Nielsen | AI as stand-in for S02 | Review record, the wiki in docs/wiki after the sidebar change of framework 0.19.0 | [1f28129] |
 
 ---
 
@@ -56,3 +56,4 @@ Go-with-conditions - the wiki meets every Mandatory criterion of QC-WIKI-001 in 
 
 [MIL-008]: ../../milestones/mil-008-documentation.md
 [QC-WIKI-001]: ../../../framework/qc/artifacts/qc-wiki.md
+[1f28129]: https://git.tirsystem.com/Tirsvad-Udemy-100-days-of-code/049-snack-and-lift/commit/1f281294cca20462b0925c84889d33fd69329a5c

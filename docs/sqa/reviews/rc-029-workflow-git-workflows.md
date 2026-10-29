@@ -9,7 +9,7 @@
 ## Version History
 | Date | Status | Author | Reviewer | Change | Commit |
 | --- | --- | --- | --- | --- | --- |
-| 2026-10-29 | Accepted | Jens Tirsvad Nielsen | AI as stand-in for S02 | Review record, the workflow sync-milestones.yml, now the file of TirSystem/git-workflows | pending |
+| 2026-10-29 | Accepted | Jens Tirsvad Nielsen | AI as stand-in for S02 | Review record, the workflow sync-milestones.yml, now the file of TirSystem/git-workflows | [1f28129] |
 
 ---
 
@@ -66,3 +66,4 @@ Go-with-conditions - the milestone workflow is the file that TirSystem/git-workf
 
 [MIL-008]: ../../milestones/mil-008-documentation.md
 [QC-WF-001]: ../../../framework/qc/code/qc-workflow.md
+[1f28129]: https://git.tirsystem.com/Tirsvad-Udemy-100-days-of-code/049-snack-and-lift/commit/1f281294cca20462b0925c84889d33fd69329a5c
