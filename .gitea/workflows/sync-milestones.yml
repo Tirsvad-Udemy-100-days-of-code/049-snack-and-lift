@@ -8,24 +8,18 @@
 # deleted. Each run updates the issues of every accepted milestone (the sync is
 # idempotent, but the host records the edit).
 #
-# INSTALLING THIS FILE IS THE STANDING AUTHORIZATION TO PUBLISH. A project opts
-# in by copying it; an agent does not install it on its own.
+# INSTALLING THIS FILE IS THE STANDING AUTHORIZATION TO PUBLISH. This project
+# installed it on 2026-10-29 at the request of S01.
 #
-# Copy it to .gitea/workflows/sync-milestones.yml (Gitea Actions) or
-# .github/workflows/sync-milestones.yml (GitHub Actions). Then:
-#   1. Create a CI secret and put its name in the two `secrets.` lines below
-#      (TOKEN_FOR_GITEA_ISSUES is the name the
-#      framework uses). Gitea does not accept secret names that
-#      start with GITEA_ or GITHUB_.
-#   2. Give the token the smallest scope that works: read and write on issues
-#      and milestones. If the framework submodule is a private repository, the
-#      token must also be able to read it (it is used to check it out).
-#   3. Run it once by hand from the Actions page with dry_run left on: it prints
-#      the plan and creates nothing. Turn dry_run off only for a real run.
+# Secrets, each the bare Gitea token of the organization (no JSON):
+# TOKEN_FOR_GITEA_REPO checks out the project and the framework repository, a
+# private submodule, so it needs read on repositories; TOKEN_FOR_GITEA_ISSUES
+# publishes and needs read and write on issues and milestones only. Gitea does
+# not accept secret names that start with GITEA_ or GITHUB_.
+#
+# Run it once by hand from the Actions page with dry_run left on: it prints
+# the plan and creates nothing. Turn dry_run off only for a real run.
 # A runner must be registered for the repository (or its organisation).
-#
-# The steps are one command each: the logic is framework/scripts/ci-publish-milestones.sh,
-# a file that is linted and tested (QC-WF-001 criterion 20).
 
 name: Publish accepted milestones
 
@@ -57,29 +51,29 @@ jobs:
       - name: Check out the project
         uses: actions/checkout@v4.2.2
         with:
-          token: ${{ secrets.TOKEN_FOR_GITEA_ISSUES }}
+          token: ${{ secrets.TOKEN_FOR_GITEA_REPO }}
 
-      # The framework submodule is registered with an SSH address, which the runner
-      # cannot use. The address is rewritten to HTTPS for this step only, and the token
-      # goes in through the environment, never on a command line. .gitmodules stays.
-      - name: Fetch the framework submodule over HTTPS
+      # .gitmodules uses ssh:// URLs and the runner has no SSH key, so the
+      # submodules (framework, and framework/qc inside it) are fetched over HTTPS
+      # with the same token (TOKEN_FOR_GITEA_REPO). The token goes through the environment, not a
+      # command line.
+      - name: Check out the framework submodules over HTTPS
         env:
           GIT_CONFIG_COUNT: "2"
-          GIT_CONFIG_KEY_0: url.https://git.tirsystem.com/.insteadOf
-          GIT_CONFIG_VALUE_0: ssh://git@git.tirsystem.com:10022/
-          GIT_CONFIG_KEY_1: http.https://git.tirsystem.com/.extraheader
-          GIT_CONFIG_VALUE_1: "Authorization: token ${{ secrets.TOKEN_FOR_GITEA_ISSUES }}"
-        run: git submodule update --init --recursive
+          GIT_CONFIG_KEY_0: "url.https://git.tirsystem.com/.insteadOf"
+          GIT_CONFIG_VALUE_0: "ssh://git@git.tirsystem.com:10022/"
+          GIT_CONFIG_KEY_1: "http.extraheader"
+          GIT_CONFIG_VALUE_1: "Authorization: token ${{ secrets.TOKEN_FOR_GITEA_REPO }}"
+        run: |
+          set -euo pipefail
+          git submodule update --init --recursive --depth=1
 
       - name: Make sure curl and jq are available
         run: bash framework/scripts/ci-publish-milestones.sh ensure-tools
 
       - name: Publish accepted milestones
         env:
-          # Gitea reads TOKEN_FOR_GITEA_ISSUES, GitHub's gh reads GH_TOKEN; both
-          # come from the one secret named above.
           TOKEN_FOR_GITEA_ISSUES: ${{ secrets.TOKEN_FOR_GITEA_ISSUES }}
-          GH_TOKEN: ${{ secrets.TOKEN_FOR_GITEA_ISSUES }}
           # Empty on a push (a real run); "true" or "false" on a manual run.
           DRY_RUN: ${{ inputs.dry_run }}
         run: bash framework/scripts/ci-publish-milestones.sh publish
