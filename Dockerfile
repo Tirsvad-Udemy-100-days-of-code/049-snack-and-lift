@@ -17,7 +17,9 @@ COPY src ./src
 RUN python -m pip install --no-cache-dir --upgrade pip && python -m pip install --no-cache-dir -e ".[dev]"
 COPY tests ./tests
 
-RUN useradd --create-home --uid 1000 app && chown -R app:app /app
+RUN useradd --create-home --uid 1000 app \
+    && mkdir -p /app/chrome_profile /app/screenshots \
+    && chown -R app:app /app
 USER app
 
 ENTRYPOINT ["python", "-m", "snack_and_lift"]
