@@ -14,7 +14,10 @@ RUN apt-get update \
 WORKDIR /app
 COPY pyproject.toml README.md LICENSE ./
 COPY src ./src
-RUN python -m pip install --upgrade pip && python -m pip install -e ".[dev]"
+RUN python -m pip install --no-cache-dir --upgrade pip && python -m pip install --no-cache-dir -e ".[dev]"
 COPY tests ./tests
+
+RUN useradd --create-home --uid 1000 app && chown -R app:app /app
+USER app
 
 ENTRYPOINT ["python", "-m", "snack_and_lift"]
